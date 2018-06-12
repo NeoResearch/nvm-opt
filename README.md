@@ -13,6 +13,7 @@ Project will start with a simple algorithm for removing NOP opcodes.
 - Removal of useless opcode pairs (toaltstack -> fromaltstack)
 - Removal of unused local variables (reducing initial local array)
 - Add unit testing
+- Create direct dependency graph, which makes removals easier and also detection of unreachable code
 
 
 *What does it currently do?*
