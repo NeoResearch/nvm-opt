@@ -7,6 +7,7 @@ reducing avm size by removing useless opcodes.
 Project will start with a simple algorithm for removing NOP opcodes.
 
 *Next steps:*
+- Update decompiler with newer opcodes (and adjust some opcode arguments)
 - Adjusts of forward jumps (backward jumps are already done)
 - Removal of useless JUMPS
 - Unreachable code detection
