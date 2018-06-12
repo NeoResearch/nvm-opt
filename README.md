@@ -30,6 +30,17 @@ After NOP removal (-3 NOPs):
 c6c6f05576f726c645272680f4e656f2e53746f726167652e5075746c7566
 ```
 
+```
+HelloWorld.py
+53c56b68164e656f2e53746f726167652e476574436f6e74657874610548
+656c6c6f05576f726c645272680f4e656f2e53746f726167652e50757461
+006c7566
+
+After NOP removal (-2 NOPs) (Python is returning zero, not void, that explains the extra byte)
+53c56b68164e656f2e53746f726167652e476574436f6e746578740548656
+c6c6f05576f726c645272680f4e656f2e53746f726167652e507574006c7566
+```
+
 - NOP removal was also tested on basic `CheckWitness` example, but forward jumps
 are not yet adjusted (backward jumps are already done), so it cannot remove NOPs
 on this project yet.
