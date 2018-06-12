@@ -18,6 +18,7 @@ Project will start with a simple algorithm for removing NOP opcodes.
 
 *What does it currently do?*
 
+- NOP removal was tested on basic `HelloWorld` example
 ```
 HelloWorld.cs
 00c56b6168164e656f2e53746f726167652e476574436f6e746578740548
@@ -29,6 +30,9 @@ After NOP removal (-3 NOPs):
 c6c6f05576f726c645272680f4e656f2e53746f726167652e5075746c7566
 ```
 
+- NOP removal was also tested on basic `CheckWitness` example, but forward jumps
+are not yet adjusted (backward jumps are already done), so it cannot remove NOPs
+on this project yet.
 
 _NeoResearch team_
 
