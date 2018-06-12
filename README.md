@@ -17,7 +17,7 @@ Project will start with a simple algorithm for removing NOP opcodes.
 
 
 *What does it currently do?*
-
+- Project is integrated with Eco platform: https://neocompiler.io
 - NOP removal was tested on basic `HelloWorld` example
 ```
 HelloWorld.cs
