@@ -99,6 +99,30 @@ public static int Main()
 00c56b556506006c756651c56b6a00527ac46a00c35a956c7566
 #OPTIMIZED AVM USING neon-opt: bytes 21.21% | ops 22.58%
 ```
+- The idea of inlining can be useful here:
+```
+51 PUSH1  # The number 1 is pushed onto the stack.
+c5 NEWARRAY  #
+6b TOALTSTACK  # Puts the input onto the top of the alt stack. Removes it from the main stack.
+6a DUPFROMALTSTACK  #
+00 PUSH0  #An empty array of bytes is pushed onto the stack
+52 PUSH2  # The number 2 is pushed onto the stack.
+7a ROLL  # The item n back in the stack is moved to the top.
+c4 SETITEM  #
+6a DUPFROMALTSTACK  #
+00 PUSH0  #An empty array of bytes is pushed onto the stack
+c3 PICKITEM  #
+5a PUSH10  # The number 10 is pushed onto the stack.
+95 MUL  # a is multiplied by b.
+
+becomes:
+
+5a PUSH5 # The number 5 is pushed onto the stack.
+5a PUSH10  # The number 10 is pushed onto the stack.
+95 MUL  # a is multiplied by b.
+```
+
+
 
 _NeoResearch team_
 
