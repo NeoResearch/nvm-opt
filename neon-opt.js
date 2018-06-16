@@ -507,7 +507,7 @@ class NeonOpt
       var i = 0;
       while(i < oplist.length-2)
       {
-         if((oplist[i].hexcode == "6c") && (oplist[i+1].hexcode == "76") && (oplist[i].hexcode == "6b"))
+         if((oplist[i].hexcode == "6c") && (oplist[i+1].hexcode == "76") && (oplist[i+2].hexcode == "6b"))
          {
             console.log("will add DUPFROMALTSTACK at i="+i+" oplist="+oplist.length+"\n");
             count_change++;
