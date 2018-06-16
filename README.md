@@ -51,7 +51,7 @@ After NOP removal (-2 NOPs)
 
 - Optimization tested on basic `CheckWitness` example
 ```
-CheckWitness.cs (base)
+CheckWitness.cs (base) # USING SCRIPTHASH, SHORTER...
 00c56b611423ba2703c53263e8d6e522dc32203339dcd8eee96168184e65
 6f2e52756e74696d652e436865636b5769746e65737364320051c576000f
 4f574e45522069732063616c6c6572c46168124e656f2e52756e74696d65
@@ -66,7 +66,7 @@ CheckWitness.cs (opt)
 
 ============================================================
 
-CheckWitness.py (base)
+CheckWitness.py (base) # USING PUBLICKEY, EXPECTS TO BE LONGER...
 58c56b21031a6c6fbbdf02ca351745fa86b9ba5a9452d785ac4f7fc2b754
 8ca2a46c4fcf4a6a00527ac46a00c368184e656f2e52756e74696d652e43
 6865636b5769746e657373616a51527ac46a51c36428000f4f574e455220
