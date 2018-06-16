@@ -15,6 +15,13 @@ Project will start with a simple algorithm for removing NOP opcodes.
 - Add unit testing
 - Create direct dependency graph, which makes removals easier and also detection of unreachable code
 
+*Ideas*
+- Use in C# opcode `6a DUPFROMALTSTACK` which can replace 3:
+```
+ 6c FROMALTSTACK  # Puts the input onto the top of the main stack. Removes it from the alt stack.
+ 76 DUP  # Duplicates the top stack item.
+ 6b TOALTSTACK  # Puts the input onto the top of the alt stack. Removes it from the main stack.
+```
 
 *What does it currently do?*
 - Updates JMP and CALL after NOP removal
