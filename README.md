@@ -8,6 +8,7 @@ Project will start with a simple algorithm for removing NOP opcodes.
 
 *Next steps:*
 - Update decompiler with newer opcodes (and adjust some opcode arguments)
+- *automatically inline function calls*
 - Removal of useless JUMPS
 - Unreachable code detection
 - Removal of useless opcode pairs (toaltstack -> fromaltstack)
