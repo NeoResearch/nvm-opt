@@ -488,7 +488,7 @@ class NeonOpt
             countnop++;
             // found NOP!
             // Step 0: remove NOP
-            count_jmp_adjust += removeOP(oplist, i); // automatically adjust jumps
+            count_jmp_adjust += NeonOpt.removeOP(oplist, i); // automatically adjust jumps
             //console.log("adjusted "+jmps+" jumps/calls");
          }
          else // if NOP not found
