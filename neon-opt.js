@@ -414,12 +414,69 @@ class NeonOpt
    }
 
 
+   // remove operation index 'i' at operation list 'oplist' (and adjust JMP/CALL)
+   static removeOP(oplist, i)
+   {
+      // remove operation i
+      oplist.splice(i, 1);
+
+      var count_jmp_fwd_adjust = 0; // forward jumps
+      var count_jmp_bwd_adjust = 0; // backward jumps
+
+      // Step 1: update forward jumps
+      var j = i - 1;
+      var count_dist = 1; // 1 byte
+      while(j > 0) {
+         if((oplist[j].opname[0] == 'J') ||(oplist[j].hexcode == "65")) { // JUMP or CALL(0x65)
+            var jmp = NeonOpt.byteArray2ToInt16(NeonOpt.littleHexStringToBigByteArray(oplist[j].args));
+            if(count_dist <= jmp) // jump (-3 bytes) after or equals to NOP position
+            {
+               //console.log("Jumping "+jmp+"positions forward at j="+j+ " (nop at i="+i+")");
+               //console.log("count_dist "+count_dist+"<= jmp="+jmp);
+               count_jmp_fwd_adjust++;
+               jmp -= 1;
+               var ba_jmp = NeonOpt.bigByteArray2TolittleHexString(NeonOpt.int16ToByteArray2(jmp));
+               //console.log("next jump value="+jmp+" ba="+ba_jmp);
+               oplist[j].args = ba_jmp;
+               oplist[j].comment = "# "+jmp;
+            }
+         }
+         count_dist += oplist[j].size; // add size of current opcode
+         j--;
+      } // end while step 1
+
+      // Step 2: update backward jumps
+      var j = i;
+      var count_dist = 1; // 1 byte
+      while(j < oplist.length) {
+         // if jump! check if nop removal the jump (must add 1).
+         if((oplist[j].opname[0] == 'J') ||(oplist[j].hexcode == "65")) { // JUMP or CALL(0x65)
+            //console.log("FOUND JUMP AT j="+j+" count_dist="+count_dist);
+            var jmp = NeonOpt.byteArray2ToInt16(NeonOpt.littleHexStringToBigByteArray(oplist[j].args));
+            //console.log("initial jump value="+jmp+" ba="+oplist[j].args);
+            if(jmp <= -count_dist) // jump (-3 bytes) before or equals to NOP position
+            {
+               // adjust jump value (+1)
+               count_jmp_bwd_adjust++;
+               jmp += 1;
+               var ba_jmp = NeonOpt.bigByteArray2TolittleHexString(NeonOpt.int16ToByteArray2(jmp));
+               //console.log("next jump value="+jmp+" ba="+ba_jmp);
+               oplist[j].args = ba_jmp;
+               oplist[j].comment = "# "+jmp;
+            }
+         }
+         count_dist += oplist[j].size; // add size of current opcode
+         j++;
+      } // finish step 2 jump search
+
+      return count_jmp_bwd_adjust + count_jmp_fwd_adjust;
+   }
+
    static removeNOP(oplist)
    {
       //console.log("Removing NOP from oplist(size="+oplist.length+")");
       var countnop = 0;
-      var count_jmp_fwd_adjust = 0; // forward jumps
-      var count_jmp_bwd_adjust = 0; // backward jumps
+      var count_jmp_adjust = 0;
       var i = 0;
       while(i < oplist.length)
       {
@@ -431,63 +488,14 @@ class NeonOpt
             countnop++;
             // found NOP!
             // Step 0: remove NOP
-            console.log("removing: "+JSON.stringify(oplist[i]));
-            oplist.splice(i, 1);
-            console.log("next i: "+JSON.stringify(oplist[i]));
-
-            // Step 1: remove forward jumps
-            var j = i - 1;
-            var count_dist = 1; // 1 byte
-            while(j > 0) {
-               if((oplist[j].opname[0] == 'J') ||(oplist[j].hexcode == "65")) { // JUMP or CALL(0x65)
-                  var jmp = NeonOpt.byteArray2ToInt16(NeonOpt.littleHexStringToBigByteArray(oplist[j].args));
-                  if(count_dist <= jmp) // jump (-3 bytes) after or equals to NOP position
-                  {
-                     console.log("Jumping "+jmp+"positions forward at j="+j+ " (nop at i="+i+")");
-                     console.log("count_dist "+count_dist+"<= jmp="+jmp);
-                     count_jmp_fwd_adjust++;
-                     jmp -= 1;
-                     var ba_jmp = NeonOpt.bigByteArray2TolittleHexString(NeonOpt.int16ToByteArray2(jmp));
-                     //console.log("next jump value="+jmp+" ba="+ba_jmp);
-                     oplist[j].args = ba_jmp;
-                     oplist[j].comment = "# "+jmp;
-                  }
-               }
-               count_dist += oplist[j].size; // add size of current opcode
-               j--;
-            } // end while step 1
-
-            // Step 2: remove backward jumps
-            var j = i;
-            var count_dist = 1; // 1 byte
-            while(j < oplist.length) {
-               // if jump! check if nop removal the jump (must add 1).
-               if((oplist[j].opname[0] == 'J') ||(oplist[j].hexcode == "65")) { // JUMP or CALL(0x65)
-                  //console.log("FOUND JUMP AT j="+j+" count_dist="+count_dist);
-                  var jmp = NeonOpt.byteArray2ToInt16(NeonOpt.littleHexStringToBigByteArray(oplist[j].args));
-                  //console.log("initial jump value="+jmp+" ba="+oplist[j].args);
-                  if(jmp <= -count_dist) // jump (-3 bytes) before or equals to NOP position
-                  {
-                     // adjust jump value (+1)
-                     count_jmp_bwd_adjust++;
-                     jmp += 1;
-                     var ba_jmp = NeonOpt.bigByteArray2TolittleHexString(NeonOpt.int16ToByteArray2(jmp));
-                     //console.log("next jump value="+jmp+" ba="+ba_jmp);
-                     oplist[j].args = ba_jmp;
-                     oplist[j].comment = "# "+jmp;
-                  }
-               }
-               count_dist += oplist[j].size; // add size of current opcode
-               j++;
-            } // finish step 2 jump search
-
-            // no more optimizations for NOP
+            count_jmp_adjust += removeOP(oplist, i); // automatically adjust jumps
+            //console.log("adjusted "+jmps+" jumps/calls");
          }
          else // if NOP not found
             i++;
       }
 
-      console.log("removed NOPs: "+countnop+" Adjusted "+count_jmp_fwd_adjust+" fwd jumps and "+count_jmp_bwd_adjust+" bwd jumps.");
+      console.log("removed NOPs: "+countnop+" Adjusted "+count_jmp_adjust+" jumps/calls.");
       return countnop;
    } // removeNOP
 
