@@ -59,6 +59,53 @@ After NOP removal (-5 NOPs)
 74696679516c7566006c7566
 ```
 
+- This simple contract seems to indicate many things to remove:
+```
+public static int teste(int x)
+{
+    return x*10;
+}
+public static int Main()
+{
+    return teste(5);
+}
+
+Generating: 00c56b5561650700616c756651c56b6c766b00527ac46c766b00c35a95616c7566
+NOP removal (-3 => 9.09%): 00c56b556506006c756651c56b6c766b00527ac46c766b00c35a956c7566
+#33 bytes
+00 PUSH0  #An empty array of bytes is pushed onto the stack
+c5 NEWARRAY  #
+6b TOALTSTACK  # Puts the input onto the top of the alt stack. Removes it from the main stack.
+55 PUSH5  # The number 5 is pushed onto the stack.
+61 NOP  # Does nothing.
+65 CALL 0700 # 7
+61 NOP  # Does nothing.
+6c FROMALTSTACK  # Puts the input onto the top of the main stack. Removes it from the alt stack.
+75 DROP  # Removes the top stack item.
+66 RET  #
+51 PUSH1  # The number 1 is pushed onto the stack.
+c5 NEWARRAY  #
+6b TOALTSTACK  # Puts the input onto the top of the alt stack. Removes it from the main stack.
+6c FROMALTSTACK  # Puts the input onto the top of the main stack. Removes it from the alt stack.
+76 DUP  # Duplicates the top stack item.
+6b TOALTSTACK  # Puts the input onto the top of the alt stack. Removes it from the main stack.
+00 PUSH0  #An empty array of bytes is pushed onto the stack
+52 PUSH2  # The number 2 is pushed onto the stack.
+7a ROLL  # The item n back in the stack is moved to the top.
+c4 SETITEM  #
+6c FROMALTSTACK  # Puts the input onto the top of the main stack. Removes it from the alt stack.
+76 DUP  # Duplicates the top stack item.
+6b TOALTSTACK  # Puts the input onto the top of the alt stack. Removes it from the main stack.
+00 PUSH0  #An empty array of bytes is pushed onto the stack
+c3 PICKITEM  #
+5a PUSH10  # The number 10 is pushed onto the stack.
+95 MUL  # a is multiplied by b.
+61 NOP  # Does nothing.
+6c FROMALTSTACK  # Puts the input onto the top of the main stack. Removes it from the alt stack.
+75 DROP  # Removes the top stack item.
+66 RET  #
+```
+
 _NeoResearch team_
 
 _Copyleft 2018 - MIT License_
