@@ -439,7 +439,7 @@ class NeonOpt
             var j = i - 1;
             var count_dist = 1; // 1 byte
             while(j > 0) {
-               if(oplist[j].opname[0] == 'J') { // JUMP
+               if((oplist[j].opname[0] == 'J') ||(oplist[j].hexcode == "65"))) { // JUMP or CALL(0x65)
                   var jmp = NeonOpt.byteArray2ToInt16(NeonOpt.littleHexStringToBigByteArray(oplist[j].args));
                   if(count_dist <= jmp) // jump (-3 bytes) after or equals to NOP position
                   {
@@ -462,7 +462,7 @@ class NeonOpt
             var count_dist = 1; // 1 byte
             while(j < oplist.length) {
                // if jump! check if nop removal the jump (must add 1).
-               if(oplist[j].opname[0] == 'J') { // JUMP
+               if((oplist[j].opname[0] == 'J') ||(oplist[j].hexcode == "65"))) { // JUMP or CALL(0x65)
                   //console.log("FOUND JUMP AT j="+j+" count_dist="+count_dist);
                   var jmp = NeonOpt.byteArray2ToInt16(NeonOpt.littleHexStringToBigByteArray(oplist[j].args));
                   //console.log("initial jump value="+jmp+" ba="+oplist[j].args);
