@@ -517,7 +517,7 @@ class NeonOpt
             // Step 2: remove 76
             count_jmp_adjust += NeonOpt.removeOP(oplist, i); // automatically adjust jumps
             // Step 3: rename 6b to 6a
-            oplist[i].hexcode = "6a"; oplist[i].comment = "#";
+            oplist[i].hexcode = "6a"; oplist[i].opname="DUPFROMALTSTACK"; oplist[i].comment = "#";
          }
          else // if NOP not found
             i++;
