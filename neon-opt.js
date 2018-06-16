@@ -499,6 +499,34 @@ class NeonOpt
       return countnop;
    } // removeNOP
 
+   // detect the sequence: 6c FROMALTSTACK -> 76 DUP -> 6b TOALTSTACK and convert to 6a DUPFROMALTSTACK
+   static detectDUPFROMALTSTACK(oplist)
+   {
+      var count_change = 0;
+      var count_jmp_adjust = 0;
+      var i = 0;
+      while(i < oplist.length-2)
+      {
+         if((oplist[i].hexcode == "6c") && (oplist[i+1].hexcode == "76") && (oplist[i].hexcode == "6b"))
+         {
+            console.log("will add DUPFROMALTSTACK at i="+i+" oplist="+oplist.length+"\n");
+            count_change++;
+
+            // Step 1: remove 6c
+            count_jmp_adjust += NeonOpt.removeOP(oplist, i); // automatically adjust jumps
+            // Step 2: remove 76
+            count_jmp_adjust += NeonOpt.removeOP(oplist, i); // automatically adjust jumps
+            // Step 3: rename 6b to 6a
+            oplist[i].hexcode = "6a"; oplist[i].comment = "#";
+         }
+         else // if NOP not found
+            i++;
+      }
+
+      console.log("added DUPFROMALTSTACK: "+count_change+" Adjusted "+count_jmp_adjust+" jumps/calls.");
+      return count_change;
+   } // detectDUPFROMALTSTACK
+
    static getAVMFromList(oplist) {
       var avm = "";
       var i = 0;
