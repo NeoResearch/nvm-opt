@@ -7,7 +7,6 @@ reducing avm size by removing useless opcodes.
 Project will start with a simple algorithm for removing NOP opcodes.
 
 *Next steps:*
-- Update CALLs after NOP removal
 - Update decompiler with newer opcodes (and adjust some opcode arguments)
 - Removal of useless JUMPS
 - Unreachable code detection
@@ -18,6 +17,7 @@ Project will start with a simple algorithm for removing NOP opcodes.
 
 
 *What does it currently do?*
+- Updates JMP and CALL after NOP removal
 - Project is integrated with Eco platform: https://neocompiler.io
 - Results for C# ICO template with only NOP reduction strategy: operation reduction 9.31%; byte compression 3.51%
 - NOP removal was tested on basic `HelloWorld` example
