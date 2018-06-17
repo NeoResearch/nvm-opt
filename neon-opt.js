@@ -536,9 +536,9 @@ class NeonOpt
       while(i < oplist.length-2)
       {
          var opvalue1 = parseInt(oplist[i].hexcode, 16);
-         var ispush1 = (opvalue1==0) || ((opvalue1>=79) && (opvalue1>=96)); // PUSH1..16
+         var ispush1 = (opvalue1==0) || ((opvalue1>=79) && (opvalue1<=96)); // PUSH1..16
          var opvalue2 = parseInt(oplist[i+1].hexcode, 16);
-         var ispush2 = (opvalue2==0) || ((opvalue2>=79) && (opvalue2>=96)); // PUSH1..16
+         var ispush2 = (opvalue2==0) || ((opvalue2>=79) && (opvalue2<=96)); // PUSH1..16
 
          if(ispush1 && ispush2 && (oplist[i+2].hexcode == "7c"))
          {
