@@ -527,6 +527,40 @@ class NeonOpt
       return count_change;
    } // detectDUPFROMALTSTACK
 
+   // inline swap: PUSH_X, PUSH_Y, SWAP => PUSH_Y,PUSH_X
+   static inlineSWAP(oplist)
+   {
+      var count_change = 0;
+      var count_jmp_adjust = 0;
+      var i = 0;
+      while(i < oplist.length-2)
+      {
+         var opvalue1 = parseInt(oplist[i].hexcode, 16);
+         var ispush1 = (opvalue1==0) || ((opvalue1>=79) && (opvalue1>=96)); // PUSH1..16
+         var opvalue2 = parseInt(oplist[i+1].hexcode, 16);
+         var ispush2 = (opvalue2==0) || ((opvalue2>=79) && (opvalue2>=96)); // PUSH1..16
+
+         if(ispush1 && ispush2 && (oplist[i+2].hexcode == "7c"))
+         {
+            console.log("will inline SWAP i="+(i+2)+" oplist="+oplist.length+"\n");
+            count_change++;
+
+            // Step 1: remove SWAP
+            count_jmp_adjust += NeonOpt.removeOP(oplist, i+2); // automatically adjust jumps
+            // Step 2: swap two push operations
+            var op_tmp = oplist[i];
+            oplist[i] = oplist[i+1];
+            oplist[i+1] = op_tmp;
+         }
+         else // if NOP not found
+            i++;
+      }
+
+      console.log("inlined SWAP: "+count_change+" Adjusted "+count_jmp_adjust+" jumps/calls.");
+      return count_change;
+   } // inline SWAP
+
+
    static getAVMFromList(oplist) {
       var avm = "";
       var i = 0;
