@@ -21,6 +21,18 @@ function NeonOpcode(hexcode, opname, comment="", args="")
 
 class NeonOpt
 {
+   static parseOpcodeList(hexavm, oplist) {
+       if (hexavm.length == 0)
+           return; // string is empty
+       if (hexavm.length % 2 == 1)
+           return; // must be even pairs
+       var firstOpcode = "" + hexavm[0] + hexavm[1];
+       hexavm = hexavm.substr(2, hexavm.length);
+       //console.log("code ("+code+")");
+       hexavm = NeonOpt.parseOpcode(firstOpcode, hexavm, oplist);
+       NeonOpt.parseOpcodeList(hexavm, oplist);
+   }
+
    static parseOpcode(opcode, hexavm, oplist=[])
    {
        var pvalue = parseInt(opcode, 16);
@@ -560,6 +572,15 @@ class NeonOpt
       return count_change;
    } // inline SWAP
 
+   static optimizeAVM(oplist) {
+      console.log("will remove NOPs");
+      var nop_rem = NeonOpt.removeNOP(oplist);
+      console.log("will detectDUPFROMALTSTACK");
+      var op_dup = NeonOpt.detectDUPFROMALTSTACK(oplist);
+      console.log("will inline SWAP");
+      var op_inlineswap = NeonOpt.inlineSWAP(oplist);
+      return nop_rem + op_dup + op_inlineswap;
+   }
 
    static getAVMFromList(oplist) {
       var avm = "";
@@ -568,5 +589,6 @@ class NeonOpt
          avm += oplist[i].hexcode + oplist[i].args;
       return avm;
    }
-
 }
+
+module.exports = NeonOpt;

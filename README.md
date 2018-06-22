@@ -6,6 +6,26 @@ reducing avm size by removing useless opcodes.
 
 Project will start with a simple algorithm for removing NOP opcodes.
 
+*How to use:*
+Execute: `nodejs`
+
+`var NeonOpt = require('./neon-opt.js') // load NeonOpt module`
+
+`var avm = "00c56b51c57600026f69c46168124e656f2e52756e74696d652e4e6f74696679616c7566" // simple print example`
+
+`var oplist = [] // initialize empty list for opcodes`
+
+`NeonOpt.parseOpcodeList(avm, oplist) // parse opcodes`
+
+`oplist // print opcode list`
+
+`NeonOpt.getAVMFromList(oplist) // '00c56b51c57600026f69c46168124e656f2e52756e74696d652e4e6f74696679616c7566'`
+
+`NeonOpt.optimizeAVM(oplist) // will apply standard optimizations (remove NOP, use DUPFROMALTSTACK, inline SWAP, ...)`
+
+`NeonOpt.getAVMFromList(oplist) // '00c56b51c57600026f69c468124e656f2e52756e74696d652e4e6f746966796c7566'`
+
+
 *Next steps:*
 - Update decompiler with newer opcodes (and adjust some opcode arguments)
 - *automatically inline function calls*
