@@ -195,7 +195,7 @@ class NeonOpt
                hexavm = hexavm.substr(2, hexavm.length);
                cpush += hexchar;
                var cval = parseInt(hexchar, 16);
-               
+
                if((cval >= 32) && (cval <= 126)) // from char 20 (SPACE) to 126 (TILDE)
                   sfunc += String.fromCharCode(cval);
                //var cvalue = String.fromCharCode(parseInt(codepush, 16));
@@ -603,4 +603,5 @@ class NeonOpt
    }
 }
 
-module.exports = NeonOpt;
+if(typeof module !== 'undefined')
+   module.exports = NeonOpt;
