@@ -43,12 +43,18 @@ class NeonOpt
            var strcomment = "# ";
            var i = 0;
            var cpush = "";
+           var sfunc = "";
            for (i = 0; i < pvalue; i++) {
-               cpush += "" + hexavm[0] + hexavm[1];
+               var hexchar = "" + hexavm[0] + hexavm[1];
                hexavm = hexavm.substr(2, hexavm.length);
+               cpush += hexchar;
+
+               var cval = parseInt(hexchar, 16);
+               if((cval >= 32) && (cval <= 126)) // from char 20 (SPACE) to 126 (TILDE)
+                  sfunc += String.fromCharCode(cval);
            }
            //strcomment = " \"" + spush + "\" ";
-           strcomment += "# 0x01-0x4B The next opcode bytes is data to be pushed onto the stack";
+           strcomment += sfunc;
            oplist.push(new NeonOpcode(opcode, "PUSHBYTES" + pvalue, strcomment, cpush));
        }
        //else if(opcode == "01")
@@ -182,11 +188,16 @@ class NeonOpt
            cpush = nparfunc;
            hexavm = hexavm.substr(2, hexavm.length);
            var fvalue = parseInt(nparfunc, 16);
-           //sfunc = "";
+           var sfunc = ""; // hexcode in string char format
            var i = 0;
            for (i = 0; i < fvalue; i++) {
-               cpush += "" + hexavm[0] + hexavm[1];
+               var hexchar = "" + hexavm[0] + hexavm[1];
                hexavm = hexavm.substr(2, hexavm.length);
+               cpush += hexchar;
+               var cval = parseInt(hexchar, 16);
+               
+               if((cval >= 32) && (cval <= 126)) // from char 20 (SPACE) to 126 (TILDE)
+                  sfunc += String.fromCharCode(cval);
                //var cvalue = String.fromCharCode(parseInt(codepush, 16));
                //sfunc += cvalue;
                //if (sfunc == "Neo.Storage")
@@ -194,6 +205,7 @@ class NeonOpt
                //target.val(target.val() + cvalue);
            }
            //target.val(target.val() + "\n");
+           strcomment += sfunc;
            oplist.push(new NeonOpcode(opcode, "SYSCALL", strcomment, cpush));
        }
        else if ((opcode == "67") ||  (opcode == "69")) {  // read 20 bytes in reverse order
