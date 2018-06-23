@@ -142,7 +142,9 @@ becomes:
 95 MUL  # a is multiplied by b.
 ```
 
-
+As noticed in a discussion at https://github.com/CityOfZion/neo-boa/issues/83, the function GetCallingScriptHash() may
+change behavior after CALL inlining. So a warning should be issued for the user, regarding further testing if using the
+inliner and this type of function.
 
 _NeoResearch team_
 
