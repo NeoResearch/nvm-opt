@@ -146,6 +146,28 @@ As noticed in a discussion at https://github.com/CityOfZion/neo-boa/issues/83, t
 change behavior after CALL inlining. So a warning should be issued for the user, regarding further testing if using the
 inliner and this type of function.
 
+
+---------------
+
+I'm starting to wonder that...
+```
+01 PUSHBYTES1 00  OR any kind of push in main stack
+6a DUPFROMALTSTACK  OR any kind of push in main stack
+51 PUSH1  # The number 1 is pushed onto the stack.
+52 PUSH2  # The number 2 is pushed onto the stack.
+7a ROLL  # The item n back in the stack is moved to the top.
+```
+can become:
+```
+01 PUSHBYTES1 00  OR any kind of push in main stack
+6a DUPFROMALTSTACK  OR any kind of push in main stack
+51 PUSH1  # The number 1 is pushed onto the stack.
+7b ROT    
+```
+
+The same may apply to PUSH1/ROLL -> SWAP.
+
+
 _NeoResearch team_
 
 _Copyleft 2018 - MIT License_
