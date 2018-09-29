@@ -1,5 +1,5 @@
-const NeonOpt = require('./neon-opt').NeonOpt;
+const AvmOptimizer = require('./AvmOptimizer').AvmOptimizer;
 
 module.exports = {
-  NeonOpt
+  AvmOptimizer
 }

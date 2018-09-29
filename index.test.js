@@ -1,4 +1,4 @@
-const NeonOpt = require('./neon-opt').NeonOpt;
+const AvmOptimizer = require('./AvmOptimizer').AvmOptimizer;
 
 test('testing imports', () => {
   expect(true).toBe(true);

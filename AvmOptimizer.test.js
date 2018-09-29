@@ -87,3 +87,13 @@ test('AvmOptimizer.getAVMFromList([...]) equals "00ac"', () => {
   ops.push(new NeoOpcode('ac', 'CHECKSIG'));
   expect(AvmOptimizer.getAVMFromList(ops)).toBe("00ac");
 });
+
+
+// ==============================================
+//  testing parseOpcodeList
+
+test('AvmOptimizer.getAVMFromList(AvmOptimizer.parseOpcodeList("00ac")) equals "00ac"', () => {
+  var ops = [];
+  AvmOptimizer.parseOpcodeList("00ac", ops);
+  expect( AvmOptimizer.getAVMFromList(ops)).toBe("00ac");
+});
