@@ -78,6 +78,15 @@ test('AvmOptimizer.bigByteArray2TolittleHexString([10, 1]) equals "010a"', () =>
   expect(AvmOptimizer.bigByteArray2TolittleHexString([10, 1])).toEqual("010a");
 });
 
+test('AvmOptimizer.littleHexStringToBigByteArray("2f00") equals [0, 47]', () => {
+  expect(AvmOptimizer.littleHexStringToBigByteArray("2f00")).toEqual([0, 47]);
+});
+
+test('AvmOptimizer.byteArray2ToInt16(AvmOptimizer.littleHexStringToBigByteArray("2f00")) equals 47', () => {
+  expect( AvmOptimizer.byteArray2ToInt16(AvmOptimizer.littleHexStringToBigByteArray("2f00")) ).toBe(47);
+});
+
+
 // =============================================
 // testing getAVMFromList
 
@@ -113,6 +122,27 @@ test('AvmOptimizer.parseOpcodeList("21031a6c6fbbdf02ca351745fa86b9ba5a9452d785ac
 test('AvmOptimizer.parseOpcodeList(HelloWorldAVM)', () => {
   var avm = "00c56b68164e656f2e53746f726167652e476574436f6e746578740548656c6c6f05576f726c645272680f4e656f2e53746f726167652e5075746c7566";
   var avmOut = "[(0:PUSH0:),(1:NEWARRAY:),(2:TOALTSTACK:),(3:SYSCALL:164e656f2e53746f726167652e476574436f6e74657874),(27:PUSHBYTES5:48656c6c6f),(33:PUSHBYTES5:576f726c64),(39:PUSH2:),(40:XSWAP:),(41:SYSCALL:0f4e656f2e53746f726167652e507574),(58:FROMALTSTACK:),(59:DROP:),(60:RET:)]";
+  var ops = [];
+  AvmOptimizer.parseOpcodeList(avm, ops);
+  expect( NeoOpcode.printList(ops) ).toBe(avmOut);
+});
+
+test('AvmOptimizer.parseOpcodeList(CheckWitnessAVM)', () => {
+  var avm = "00c56b1423ba2703c53263e8d6e522dc32203339dcd8eee968184e656f2e\
+52756e74696d652e436865636b5769746e657373642f0051c576000f4f57\
+4e45522069732063616c6c6572c468124e656f2e52756e74696d652e4e6f74696679516c7566006c7566";
+  var avmOut = "[(0:PUSH0:),(1:NEWARRAY:),(2:TOALTSTACK:),(3:PUSHBYTES20:23ba2703c53263e8d6e522dc32203339dcd8eee9),\
+(24:SYSCALL:184e656f2e52756e74696d652e436865636b5769746e657373),(50:JMPIFNOT:2f00),(53:PUSH1:),(54:NEWARRAY:),(55:DUP:),(56:PUSH0:),\
+(57:PUSHBYTES15:4f574e45522069732063616c6c6572),(73:SETITEM:),(74:SYSCALL:124e656f2e52756e74696d652e4e6f74696679),(94:PUSH1:),(95:FROMALTSTACK:),\
+(96:DROP:),(97:RET:),(98:PUSH0:),(99:FROMALTSTACK:),(100:DROP:),(101:RET:)]";
+  var ops = [];
+  AvmOptimizer.parseOpcodeList(avm, ops);
+  expect( NeoOpcode.printList(ops) ).toBe(avmOut);
+});
+
+test('AvmOptimizer.parseOpcodeList(WhileTrue)', () => {
+  var avm = "00c56b620000";
+  var avmOut = "[(0:PUSH0:),(1:NEWARRAY:),(2:TOALTSTACK:),(3:JMP:0000)]";
   var ops = [];
   AvmOptimizer.parseOpcodeList(avm, ops);
   expect( NeoOpcode.printList(ops) ).toBe(avmOut);

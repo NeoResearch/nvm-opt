@@ -255,28 +255,28 @@ AvmOptimizer.parseOpcode = function(opcode, hexavm, oplist=[], opcounter=0) {
 				strcomment = "# ";
 				var nparfunc = "" + hexavm[0] + hexavm[1] + hexavm[2] + hexavm[3];
 				hexavm = hexavm.substr(4, hexavm.length);
-				strcomment += ""+NeonOpt.byteArray2ToInt16(NeonOpt.littleHexStringToBigByteArray(nparfunc, opcounter));
+				strcomment += ""+AvmOptimizer.byteArray2ToInt16(AvmOptimizer.littleHexStringToBigByteArray(nparfunc, opcounter));
 				oplist.push(new NeoOpcode(opcode, "JMP", strcomment, nparfunc, opcounter));
 		}
 		else if (opcode == "63") {
 				strcomment = "# ";
 				var nparfunc = "" + hexavm[0] + hexavm[1] + hexavm[2] + hexavm[3];
 				hexavm = hexavm.substr(4, hexavm.length);
-				strcomment += ""+NeonOpt.byteArray2ToInt16(NeonOpt.littleHexStringToBigByteArray(nparfunc, opcounter));
+				strcomment += ""+AvmOptimizer.byteArray2ToInt16(AvmOptimizer.littleHexStringToBigByteArray(nparfunc, opcounter));
 				oplist.push(new NeoOpcode(opcode, "JMPIF", strcomment, nparfunc, opcounter));
 		}
 		else if (opcode == "64") {
 				strcomment = "# ";
 				var nparfunc = "" + hexavm[0] + hexavm[1] + hexavm[2] + hexavm[3];
 				hexavm = hexavm.substr(4, hexavm.length);
-				strcomment += ""+NeonOpt.byteArray2ToInt16(NeonOpt.littleHexStringToBigByteArray(nparfunc, opcounter));
+				strcomment += ""+AvmOptimizer.byteArray2ToInt16(AvmOptimizer.littleHexStringToBigByteArray(nparfunc, opcounter));
 				oplist.push(new NeoOpcode(opcode, "JMPIFNOT", strcomment, nparfunc, opcounter));
 		}
 		else if (opcode == "65") {
 			 strcomment = "# ";
 			 var nparfunc = "" + hexavm[0] + hexavm[1] + hexavm[2] + hexavm[3];
 			 hexavm = hexavm.substr(4, hexavm.length);
-			 strcomment += ""+NeonOpt.byteArray2ToInt16(NeonOpt.littleHexStringToBigByteArray(nparfunc, opcounter));
+			 strcomment += ""+AvmOptimizer.byteArray2ToInt16(AvmOptimizer.littleHexStringToBigByteArray(nparfunc, opcounter));
 			 oplist.push(new NeoOpcode(opcode, "CALL", strcomment, nparfunc, opcounter));
 			 //oplist.push(new NeoOpcode(opcode, "CALL", "#", "", opcounter));
 		}
