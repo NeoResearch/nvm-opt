@@ -126,9 +126,9 @@ AvmOptimizer.parseOpcodeList = function(hexavm, oplist, opcounter=0) {
 	if (hexavm.length % 2 == 1)
 			return; // must be even pairs
 	var firstOpcode = "" + hexavm[0] + hexavm[1];
+  var countSize = hexavm.length;
 	hexavm = hexavm.substr(2, hexavm.length);
 	//console.log("code ("+code+")");
-	var countSize = hexavm.length;
 	hexavm = AvmOptimizer.parseOpcode(firstOpcode, hexavm, oplist, opcounter);
 	AvmOptimizer.parseOpcodeList(hexavm, oplist, opcounter + (countSize-hexavm.length)/2);
 };

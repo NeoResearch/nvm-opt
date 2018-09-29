@@ -101,5 +101,11 @@ test('AvmOptimizer.getAVMFromList(AvmOptimizer.parseOpcodeList("00ac")) equals "
 test('AvmOptimizer.parseOpcodeList("00ac") equals [(0:PUSH0:),(0:CHECKSIG:)]', () => {
   var ops = [];
   AvmOptimizer.parseOpcodeList("00ac", ops);
-  expect( NeoOpcode.printList(ops) ).toBe("[(0:PUSH0:),(0:CHECKSIG:)]");
+  expect( NeoOpcode.printList(ops) ).toBe("[(0:PUSH0:),(1:CHECKSIG:)]");
+});
+
+test('AvmOptimizer.parseOpcodeList("21031a6c6fbbdf02ca351745fa86b9ba5a9452d785ac4f7fc2b7548ca2a46c4fcf4aac") equals [(0:PUSHBYTES33:031a6c6fbbdf02ca351745fa86b9ba5a9452d785ac4f7fc2b7548ca2a46c4fcf4a),(34:CHECKSIG:)]', () => {
+  var ops = [];
+  AvmOptimizer.parseOpcodeList("21031a6c6fbbdf02ca351745fa86b9ba5a9452d785ac4f7fc2b7548ca2a46c4fcf4aac", ops);
+  expect( NeoOpcode.printList(ops) ).toBe("[(0:PUSHBYTES33:031a6c6fbbdf02ca351745fa86b9ba5a9452d785ac4f7fc2b7548ca2a46c4fcf4a),(34:CHECKSIG:)]");
 });
