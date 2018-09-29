@@ -1,5 +1,8 @@
 const AvmOptimizer = require('./AvmOptimizer').AvmOptimizer;
 
+// =========================================
+// testing byteArray2ToInt16
+
 test('AvmOptimizer.byteArray2ToInt16([255]) equals 0', () => {
   expect(AvmOptimizer.byteArray2ToInt16([255])).toBe(0);
 });
@@ -45,6 +48,7 @@ test('AvmOptimizer.byteArray2ToInt16([128,1]) equals -32767', () => {
 });
 
 // ============================================
+// testing int16ToByteArray2
 
 test('AvmOptimizer.int16ToByteArray2(10) equals [0, 10]', () => {
   expect(AvmOptimizer.int16ToByteArray2(10)).toEqual([0, 10]);
@@ -60,4 +64,15 @@ test('AvmOptimizer.byteArray2ToInt16(AvmOptimizer.int16ToByteArray2(1000)) equal
 
 test('AvmOptimizer.byteArray2ToInt16(AvmOptimizer.int16ToByteArray2(-1000)) equals -1000', () => {
   expect(AvmOptimizer.byteArray2ToInt16(AvmOptimizer.int16ToByteArray2(-1000))).toBe(-1000);
+});
+
+// =============================================
+// testing littleHexStringToBigByteArray and bigByteArray2TolittleHexString
+
+test('AvmOptimizer.littleHexStringToBigByteArray("0102") equals [2, 1]', () => {
+  expect(AvmOptimizer.littleHexStringToBigByteArray("0102")).toEqual([2, 1]);
+});
+
+test('AvmOptimizer.bigByteArray2TolittleHexString([10, 1]) equals "010a"', () => {
+  expect(AvmOptimizer.bigByteArray2TolittleHexString([10, 1])).toEqual("010a");
 });

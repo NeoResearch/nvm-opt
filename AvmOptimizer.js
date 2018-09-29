@@ -60,6 +60,40 @@ AvmOptimizer.int16ToByteArray2 = function(i16)
 	 return v;
 }
 
+// convert little endian hexstring (4 chars) to big endian bytearray (2 bytes)
+AvmOptimizer.littleHexStringToBigByteArray = function(lhs4)
+{
+	 if(lhs4.length != 4)
+			return [];
+
+	 var bba = [];
+	 while(lhs4.length > 0)
+	 {
+			bba.push(Number('0x'+lhs4[0]+lhs4[1]));
+			lhs4 = lhs4.substr(2, lhs4.length);
+	 }
+	 bba.reverse(); // little endian to big endian // TODO: Why not needed?
+	 return bba;
+}
+
+AvmOptimizer.bigByteArray2TolittleHexString = function(bba2)
+{
+	 if(bba2.length != 2)
+			return "";
+
+	 var lhs4 = "";
+	 var i = 0;
+	 for(i=0; i<bba2.length; i++)
+	 {
+			var sbyte = bba2[i].toString(16);
+			if(sbyte.length == 1)
+				 sbyte = '0'+sbyte; // ensure 2 char byte
+			lhs4 = sbyte + lhs4; // back to little endian
+	 }
+	 return lhs4;
+}
+
+
 // parse opcode 'hexavm' and inserts on oplist (also increments opcounter)
 AvmOptimizer.parseOpcodeList = function(hexavm, oplist, opcounter=0) {
 	if (hexavm.length == 0)
