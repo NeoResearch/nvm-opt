@@ -28,6 +28,22 @@ NeoOpcode._construct = function(hexcode, opname, comment="", args="", byteline=0
 	return new NeoOpcode(hexcode, opname, comment, args, byteline, objargs);
 };
 
+NeoOpcode.prototype.toString = function() {
+    return "("+this.byteline+":"+this.opname+":"+this.args+")";
+}
+
+NeoOpcode.printList = function(ops) {
+  var str = "[";
+  for(var i=0; i<ops.length; i++) {
+    str+= ops[i];
+    if(i != ops.length-1)
+      str += ",";
+  }
+  str += "]";
+  return str;
+}
+
+
 // AvmOptimizer class only groups important operations (all static)
 // immutable object
 function AvmOptimizer() {
