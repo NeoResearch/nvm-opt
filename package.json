@@ -1,0 +1,28 @@
+{
+  "name": "neo-avm-optimizer",
+  "version": "0.1.0",
+  "description": "Neo AVM optimizer",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NeoResearch/neo-avm-optimizer.git"
+  },
+  "keywords": [
+    "neo",
+    "avm",
+    "optimizer"
+  ],
+  "author": "Igor M. Coelho",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/NeoResearch/neo-avm-optimizer/issues"
+  },
+  "homepage": "https://github.com/NeoResearch/neo-avm-optimizer#readme",
+  "dependencies": {
+    "jest": "^23.6.0",
+    "webpack": "^4.20.2"
+  }
+}
