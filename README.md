@@ -1,4 +1,6 @@
-# neon-opt: Neo AVM optimizer
+# neo-avm-optimizer: Neo AVM optimizer
+
+## Rebranded from neon-opt
 
 *Notice:* this project is experimental is probably quite inefficient, it must
 be considered as an inspiration for future developers to follow this path of
