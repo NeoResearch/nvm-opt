@@ -1,6 +1,6 @@
-# neo-avm-optimizer: Neo AVM optimizer
+# Neo AVM optimizer
 
-## Rebranded from neon-opt
+## Rebranded from neon-opt to follow NeoResearch guidelines and to adopt a strict/solid testing environment
 
 *Notice:* this project is experimental is probably quite inefficient, it must
 be considered as an inspiration for future developers to follow this path of
