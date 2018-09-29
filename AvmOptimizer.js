@@ -14,7 +14,7 @@
 
 // NeoOpcode supports hexcode (e.g. '00'), opname (e.g. 'ADD'), byteline (0..65k, 2 bytes),
 //    comment, args (could be any object, for example, to build "structured opcodes")
-function NeoOpcode(hexcode, opname, byteline, comment="", args="", objargs={}) {
+function NeoOpcode(hexcode, opname, byteline=0, comment="", args="", objargs={}) {
    this.hexcode = hexcode;
    this.opname = opname;
    this.comment = comment;
@@ -94,6 +94,14 @@ AvmOptimizer.bigByteArray2TolittleHexString = function(bba2)
 	 return lhs4;
 }
 
+// return avm from oplist
+AvmOptimizer.getAVMFromList = function(oplist) {
+	 var avm = "";
+	 var i = 0;
+	 for(i = 0; i<oplist.length; i++)
+			avm += oplist[i].hexcode + oplist[i].args;
+	 return avm;
+}
 
 // parse opcode 'hexavm' and inserts on oplist (also increments opcounter)
 AvmOptimizer.parseOpcodeList = function(hexavm, oplist, opcounter=0) {
@@ -113,5 +121,9 @@ AvmOptimizer.parseOpcode = function(opcode, hexavm, oplist=[], opcounter=0) {
 
 };
 
-exports.AvmOptimizer = AvmOptimizer;
+//exports.AvmOptimizer = AvmOptimizer;
+module.exports = {
+	AvmOptimizer,
+	NeoOpcode
+}
 })(typeof exports !== 'undefined' ? exports : this);

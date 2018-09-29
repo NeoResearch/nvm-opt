@@ -1,4 +1,5 @@
 const AvmOptimizer = require('./AvmOptimizer').AvmOptimizer;
+const NeoOpcode = require('./AvmOptimizer').NeoOpcode;
 
 // =========================================
 // testing byteArray2ToInt16
@@ -78,3 +79,11 @@ test('AvmOptimizer.bigByteArray2TolittleHexString([10, 1]) equals "010a"', () =>
 });
 
 // =============================================
+// testing getAVMFromList
+
+test('AvmOptimizer.getAVMFromList([...]) equals "00ac"', () => {
+  var ops = [];
+  ops.push(new NeoOpcode('00', 'PUSH0'));
+  ops.push(new NeoOpcode('ac', 'CHECKSIG'));
+  expect(AvmOptimizer.getAVMFromList(ops)).toBe("00ac");
+});
