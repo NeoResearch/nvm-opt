@@ -109,3 +109,11 @@ test('AvmOptimizer.parseOpcodeList("21031a6c6fbbdf02ca351745fa86b9ba5a9452d785ac
   AvmOptimizer.parseOpcodeList("21031a6c6fbbdf02ca351745fa86b9ba5a9452d785ac4f7fc2b7548ca2a46c4fcf4aac", ops);
   expect( NeoOpcode.printList(ops) ).toBe("[(0:PUSHBYTES33:031a6c6fbbdf02ca351745fa86b9ba5a9452d785ac4f7fc2b7548ca2a46c4fcf4a),(34:CHECKSIG:)]");
 });
+
+test('AvmOptimizer.parseOpcodeList(HelloWorldAVM)', () => {
+  var avm = "00c56b68164e656f2e53746f726167652e476574436f6e746578740548656c6c6f05576f726c645272680f4e656f2e53746f726167652e5075746c7566";
+  var avmOut = "[(0:PUSH0:),(1:NEWARRAY:),(2:TOALTSTACK:),(3:SYSCALL:164e656f2e53746f726167652e476574436f6e74657874),(27:PUSHBYTES5:48656c6c6f),(33:PUSHBYTES5:576f726c64),(39:PUSH2:),(40:XSWAP:),(41:SYSCALL:0f4e656f2e53746f726167652e507574),(58:FROMALTSTACK:),(59:DROP:),(60:RET:)]";
+  var ops = [];
+  AvmOptimizer.parseOpcodeList(avm, ops);
+  expect( NeoOpcode.printList(ops) ).toBe(avmOut);
+});
