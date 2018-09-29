@@ -4,7 +4,8 @@
   "description": "Neo AVM optimizer",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "./node_modules/.bin/jest",
+    "build": "./node_modules/.bin/webpack"
   },
   "repository": {
     "type": "git",
@@ -24,5 +25,8 @@
   "dependencies": {
     "jest": "^23.6.0",
     "webpack": "^4.20.2"
+  },
+  "devDependencies": {
+    "webpack-cli": "^3.1.1"
   }
 }
