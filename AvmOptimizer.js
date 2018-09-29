@@ -14,17 +14,18 @@
 
 // NeoOpcode supports hexcode (e.g. '00'), opname (e.g. 'ADD'), byteline (0..65k, 2 bytes),
 //    comment, args (could be any object, for example, to build "structured opcodes")
-function NeoOpcode(hexcode, opname, byteline, comment="", args="") {
+function NeoOpcode(hexcode, opname, byteline, comment="", args="", objargs={}) {
    this.hexcode = hexcode;
    this.opname = opname;
    this.comment = comment;
-   this.args = args;
+   this.args = args; // hexbyte args
+	 this.objargs = objargs; // object args
    this.size = 1+(args.length/2);
 	 this.byteline = byteline;
 };
 
-NeoOpcode._construct = function(hexcode, opname, byteline, comment="", args="") {
-	return new NeoOpcode(hexcode, opname, byteline, comment, args);
+NeoOpcode._construct = function(hexcode, opname, byteline, comment="", args="", objargs={}) {
+	return new NeoOpcode(hexcode, opname, byteline, comment, args, objargs);
 };
 
 // AvmOptimizer class only groups important operations (all static)

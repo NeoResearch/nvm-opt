@@ -76,3 +76,5 @@ test('AvmOptimizer.littleHexStringToBigByteArray("0102") equals [2, 1]', () => {
 test('AvmOptimizer.bigByteArray2TolittleHexString([10, 1]) equals "010a"', () => {
   expect(AvmOptimizer.bigByteArray2TolittleHexString([10, 1])).toEqual("010a");
 });
+
+// =============================================
