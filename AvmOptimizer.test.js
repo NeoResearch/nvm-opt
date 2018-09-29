@@ -43,3 +43,21 @@ test('AvmOptimizer.byteArray2ToInt16([128,0]) equals -32768', () => {
 test('AvmOptimizer.byteArray2ToInt16([128,1]) equals -32767', () => {
   expect(AvmOptimizer.byteArray2ToInt16([128,1])).toBe(-32767);
 });
+
+// ============================================
+
+test('AvmOptimizer.int16ToByteArray2(10) equals [0, 10]', () => {
+  expect(AvmOptimizer.int16ToByteArray2(10)).toEqual([0, 10]);
+});
+
+test('AvmOptimizer.byteArray2ToInt16(AvmOptimizer.int16ToByteArray2(10)) equals 10', () => {
+  expect(AvmOptimizer.byteArray2ToInt16(AvmOptimizer.int16ToByteArray2(10))).toBe(10);
+});
+
+test('AvmOptimizer.byteArray2ToInt16(AvmOptimizer.int16ToByteArray2(1000)) equals 1000', () => {
+  expect(AvmOptimizer.byteArray2ToInt16(AvmOptimizer.int16ToByteArray2(1000))).toBe(1000);
+});
+
+test('AvmOptimizer.byteArray2ToInt16(AvmOptimizer.int16ToByteArray2(-1000)) equals -1000', () => {
+  expect(AvmOptimizer.byteArray2ToInt16(AvmOptimizer.int16ToByteArray2(-1000))).toBe(-1000);
+});

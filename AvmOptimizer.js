@@ -36,11 +36,28 @@ AvmOptimizer._construct = function() {
 	return new AvmOptimizer();
 };
 
-// expects big endian byte array and converts to signed int16
+// expects little endian byte array and converts to signed int16
 AvmOptimizer.byteArray2ToInt16 = function(v) {
   if(v.length != 2)
      return 0;
   return  (((v[0] << 8) | v[1]) << 16) >> 16;
+}
+
+// expects signed int16 -> returns byte array with length 2
+AvmOptimizer.int16ToByteArray2 = function(i16)
+{
+	 var vhex = (i16 >>> 0).toString(16);
+	 while(vhex.length < 4)
+			vhex = '0'+vhex;
+	 while(vhex.length > 4)
+			vhex = vhex.substr(1, vhex.length);
+	 var v = [];
+	 while(v.length < 2)
+	 {
+			v.push(Number('0x'+vhex[0]+vhex[1]));
+			vhex = vhex.substr(2, vhex.length);
+	 }
+	 return v;
 }
 
 // parse opcode 'hexavm' and inserts on oplist (also increments opcounter)
