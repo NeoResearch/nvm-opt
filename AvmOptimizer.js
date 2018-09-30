@@ -23,6 +23,8 @@ function NeoOpcode(hexcode, opname, comment="", args="", byteline=0, objargs={})
    this.size = 1+(args.length/2);
 	 this.byteline = byteline;
    this.jumpsFrom = [];
+   this.callsFrom = [];
+   this.beforeIsRet = false;
 };
 
 NeoOpcode._construct = function(hexcode, opname, comment="", args="", byteline=0, objargs={}) {
@@ -469,24 +471,40 @@ AvmOptimizer.parseOpcode = function(opcode, hexavm, oplist=[], opcounter=0) {
 		return hexavm;
 };
 
+AvmOptimizer.markJumpAt = function(ops, indexLine, indexFrom, isJump=false, isCall=false) {
+  for(var j=0; j<ops.length; j++)
+    if(ops[j].byteline==indexLine) {
+      if(isJump)
+        ops[j].jumpsFrom.push(indexFrom);
+      if(isCall)
+        ops[j].callsFrom.push(indexFrom);
+    }
+}
 
 AvmOptimizer.computeJumpsFrom = function(ops) {
 
   for(var i=0; i<ops.length; i++) {
+    if((i > 0) && (ops[i-1].opname=="RET"))
+      ops[i].beforeIsRet = true;
 
-    if((ops[i].opname == "JMP") || (ops[i].opname == "JMPIF") || (ops[i].opname == "JMPIFNOT") || (ops[i].opname == "CALL")) {
+    if((ops[i].opname == "JMP") || (ops[i].opname == "JMPIF") || (ops[i].opname == "JMPIFNOT") ) {
       var offset = AvmOptimizer.byteArray2ToInt16(AvmOptimizer.littleHexStringToBigByteArray(ops[i].args));
-      ops[ ops[i].byteline + offset ].jumpsFrom.push(ops[i].byteline);
+      AvmOptimizer.markJumpAt(ops, ops[i].byteline + offset, ops[i].byteline, true, false);
+    } else if(ops[i].opname == "CALL") {
+      var offset = AvmOptimizer.byteArray2ToInt16(AvmOptimizer.littleHexStringToBigByteArray(ops[i].args));
+      AvmOptimizer.markJumpAt(ops, ops[i].byteline + offset, ops[i].byteline, false, true);
     }
 
   }
 
 };
 
+// jump list marked with: byteline, opname,  "j" (jumpsFrom), "c" (callsFrom), "r" (before is return)
 AvmOptimizer.parseJumpList = function(ops) {
   var opsJump = [];
-  for(var i=0; i<ops.length; i++)
-    opsJump.push(ops[i].jumpsFrom);
+  for(var i=0; i<ops.length; i++) {
+    opsJump.push( [ops[i].byteline, ops[i].opname, ops[i].jumpsFrom, ops[i].callsFrom, ops[i].beforeIsRet] );
+  }
   return opsJump;
 }
 

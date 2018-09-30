@@ -179,8 +179,15 @@ test('AvmOptimizer.computeJumpsFrom (x<10 then true)', () => {
   AvmOptimizer.parseOpcodeList(avm, ops);
   AvmOptimizer.computeJumpsFrom(ops);
   var opsJump = AvmOptimizer.parseJumpList(ops);
-  expect( opsJump ).toEqual([[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [17], [], []]);
+  var opsCompare = [[0, "PUSH1", [], [], false], [1, "NEWARRAY", [], [], false], [2, "TOALTSTACK", [], [], false], [3, "FROMALTSTACK", [], [], false],
+ [4, "DUP", [], [], false], [5, "TOALTSTACK", [], [], false], [6, "PUSH0", [], [], false], [7, "PUSH2", [], [], false], [8, "ROLL", [], [], false],
+ [9, "SETITEM", [], [], false], [10, "FROMALTSTACK", [], [], false], [11, "DUP", [], [], false], [12, "TOALTSTACK", [], [], false], [13, "PUSH0", [], [], false],
+ [14, "PICKITEM", [], [], false], [15, "PUSH10", [], [], false], [16, "GTE", [], [], false], [17, "JMPIF", [], [], false], [20, "PUSH1", [], [], false],
+ [0, "NOP", [], [], false], [22, "FROMALTSTACK", [], [], false], [23, "DROP", [], [], false], [24, "RET", [], [], false], [25, "PUSH0", [17], [], true],
+ [0, "NOP", [], [], false], [27, "FROMALTSTACK", [], [], false], [28, "DROP", [], [], false], [29, "RET", [], [], false]];
+  expect( opsJump ).toEqual( opsCompare );
 });
+
 
 test('AvmOptimizer.parseOpcodeList(WhileTrue)', () => {
   var avm = "00c56b620000";
@@ -188,5 +195,36 @@ test('AvmOptimizer.parseOpcodeList(WhileTrue)', () => {
   AvmOptimizer.parseOpcodeList(avm, ops);
   AvmOptimizer.computeJumpsFrom(ops);
   var opsJump = AvmOptimizer.parseJumpList(ops);
-  expect( opsJump ).toEqual([[], [], [], [3]]);
+  var opsCompare = [[0, "PUSH0", [], [], false], [1, "NEWARRAY", [], [], false], [2, "TOALTSTACK", [], [], false], [3, "JMP", [3], [], false]];
+  expect( opsJump ).toEqual( opsCompare );
+});
+
+
+test('AvmOptimizer.parseOpcodeList( SimpleCall )', () => {
+  var avm = "51c56b6c766b00527ac46c766b00c361650700616c756651c56b6c766b00527ac451616c7566";
+  var avmOut = "[(0:PUSH1:),(1:NEWARRAY:),(2:TOALTSTACK:),(3:FROMALTSTACK:),(4:DUP:),(5:TOALTSTACK:),(6:PUSH0:),(7:PUSH2:),(8:ROLL:),(9:SETITEM:),(10:FROMALTSTACK:),\
+(11:DUP:),(12:TOALTSTACK:),(13:PUSH0:),(14:PICKITEM:),(0:NOP:),(16:CALL:0700),(0:NOP:),(20:FROMALTSTACK:),(21:DROP:),(22:RET:),(23:PUSH1:),(24:NEWARRAY:),(25:TOALTSTACK:),\
+(26:FROMALTSTACK:),(27:DUP:),(28:TOALTSTACK:),(29:PUSH0:),(30:PUSH2:),(31:ROLL:),(32:SETITEM:),(33:PUSH1:),(0:NOP:),(35:FROMALTSTACK:),(36:DROP:),(37:RET:)]";
+  var ops = [];
+  AvmOptimizer.parseOpcodeList(avm, ops);
+  //AvmOptimizer.computeJumpsFrom(ops);
+  expect( NeoOpcode.printList(ops) ).toBe(avmOut);
+});
+
+
+test('AvmOptimizer.parseOpcodeList( SimpleCall )', () => {
+  var avm = "51c56b6c766b00527ac46c766b00c361650700616c756651c56b6c766b00527ac451616c7566";
+  var ops = [];
+  AvmOptimizer.parseOpcodeList(avm, ops);
+  AvmOptimizer.computeJumpsFrom(ops);
+  var opsJump = AvmOptimizer.parseJumpList(ops);
+  var opsCompare = [[0, "PUSH1", [], [], false], [1, "NEWARRAY", [], [], false], [2, "TOALTSTACK", [], [], false], [3, "FROMALTSTACK", [], [], false],
+[4, "DUP", [], [], false], [5, "TOALTSTACK", [], [], false], [6, "PUSH0", [], [], false], [7, "PUSH2", [], [], false], [8, "ROLL", [], [], false],
+[9, "SETITEM", [], [], false], [10, "FROMALTSTACK", [], [], false], [11, "DUP", [], [], false], [12, "TOALTSTACK", [], [], false], [13, "PUSH0", [], [], false],
+[14, "PICKITEM", [], [], false], [0, "NOP", [], [], false], [16, "CALL", [], [], false], [0, "NOP", [], [], false], [20, "FROMALTSTACK", [], [], false],
+[21, "DROP", [], [], false], [22, "RET", [], [], false], [23, "PUSH1", [], [16], true], [24, "NEWARRAY", [], [], false], [25, "TOALTSTACK", [], [], false],
+[26, "FROMALTSTACK", [], [], false], [27, "DUP", [], [], false], [28, "TOALTSTACK", [], [], false], [29, "PUSH0", [], [], false], [30, "PUSH2", [], [], false],
+[31, "ROLL", [], [], false], [32, "SETITEM", [], [], false], [33, "PUSH1", [], [], false], [0, "NOP", [], [], false], [35, "FROMALTSTACK", [], [], false],
+[36, "DROP", [], [], false], [37, "RET", [], [], false]];
+  expect( opsJump ).toEqual( opsCompare );
 });
