@@ -152,8 +152,9 @@ test('AvmOptimizer.parseOpcodeList(WhileTrue)', () => {
 test('AvmOptimizer.parseOpcodeList(x<10 then true)', () => {
   var avm = "51c56b6c766b00527ac46c766b00c35aa263080051616c756600616c7566";
   var avmOut = "[(0:PUSH1:),(1:NEWARRAY:),(2:TOALTSTACK:),(3:FROMALTSTACK:),(4:DUP:),(5:TOALTSTACK:),(6:PUSH0:),(7:PUSH2:),(8:ROLL:),(9:SETITEM:),(10:FROMALTSTACK:),\
-(11:DUP:),(12:TOALTSTACK:),(13:PUSH0:),(14:PICKITEM:),(15:PUSH10:),(16:GTE:),(17:JMPIF:0800),(20:PUSH1:),(0:NOP:),(22:FROMALTSTACK:),(23:DROP:),(24:RET:),(25:PUSH0:),\
-(0:NOP:),(27:FROMALTSTACK:),(28:DROP:),(29:RET:)]";
+(11:DUP:),(12:TOALTSTACK:),(13:PUSH0:),(14:PICKITEM:),(15:PUSH10:),(16:GTE:),(17:JMPIF:0800),(20:PUSH1:),(21:NOP:),(22:FROMALTSTACK:),(23:DROP:),(24:RET:),(25:PUSH0:),\
+(26:NOP:),(27:FROMALTSTACK:),(28:DROP:),(29:RET:)]";
+
   var ops = [];
   AvmOptimizer.parseOpcodeList(avm, ops);
   expect( NeoOpcode.printList(ops) ).toBe(avmOut);
@@ -164,6 +165,7 @@ test('AvmOptimizer.parseOpcodeList(x<10 then true) - OLD OPTIMIZER (JMPIF:0600 S
   var avm = "51c56b6a00527ac46a00c35aa2630600516c7566006c7566";
   var avmOut = "[(0:PUSH1:),(1:NEWARRAY:),(2:TOALTSTACK:),(3:DUPFROMALTSTACK:),(4:PUSH0:),(5:PUSH2:),(6:ROLL:),(7:SETITEM:),(8:DUPFROMALTSTACK:),(9:PUSH0:),\
 (10:PICKITEM:),(11:PUSH10:),(12:GTE:),(13:JMPIF:0600),(16:PUSH1:),(17:FROMALTSTACK:),(18:DROP:),(19:RET:),(20:PUSH0:),(21:FROMALTSTACK:),(22:DROP:),(23:RET:)]";
+
   var ops = [];
   AvmOptimizer.parseOpcodeList(avm, ops);
   expect( NeoOpcode.printList(ops) ).toBe(avmOut);
@@ -179,11 +181,12 @@ test('AvmOptimizer.computeJumpsFrom (x<10 then true)', () => {
   AvmOptimizer.parseOpcodeList(avm, ops);
   AvmOptimizer.computeJumpsFrom(ops);
   var opsJump = AvmOptimizer.parseJumpList(ops);
-  var opsCompare = [[0, "PUSH1", [], []], [1, "NEWARRAY", [], []], [2, "TOALTSTACK", [], []], [3, "FROMALTSTACK", [], []], [4, "DUP", [], []],
-[5, "TOALTSTACK", [], []], [6, "PUSH0", [], []], [7, "PUSH2", [], []], [8, "ROLL", [], []], [9, "SETITEM", [], []], [10, "FROMALTSTACK", [], []],
-[11, "DUP", [], []], [12, "TOALTSTACK", [], []], [13, "PUSH0", [], []], [14, "PICKITEM", [], []], [15, "PUSH10", [], []], [16, "GTE", [], []],
-[17, "JMPIF", [], []], [20, "PUSH1", [], []], [0, "NOP", [], []], [22, "FROMALTSTACK", [], []], [23, "DROP", [], []], [24, "RET", [], []], [25, "PUSH0", [17], []],
-[0, "NOP", [], []], [27, "FROMALTSTACK", [], []], [28, "DROP", [], []], [29, "RET", [], []]];
+  var opsCompare = [[0, "PUSH1", [], []], [1, "NEWARRAY", [], []], [2, "TOALTSTACK", [], []], [3, "FROMALTSTACK", [], []], [4, "DUP", [], []], [5, "TOALTSTACK", [], []],
+[6, "PUSH0", [], []], [7, "PUSH2", [], []], [8, "ROLL", [], []], [9, "SETITEM", [], []], [10, "FROMALTSTACK", [], []], [11, "DUP", [], []], [12, "TOALTSTACK", [], []],
+[13, "PUSH0", [], []], [14, "PICKITEM", [], []], [15, "PUSH10", [], []], [16, "GTE", [], []], [17, "JMPIF", [], []], [20, "PUSH1", [], []], [21, "NOP", [], []],
+[22, "FROMALTSTACK", [], []], [23, "DROP", [], []], [24, "RET", [], []], [25, "PUSH0", [17], []], [26, "NOP", [], []], [27, "FROMALTSTACK", [], []], [28, "DROP", [], []],
+[29, "RET", [], []]];
+
   expect( opsJump ).toEqual( opsCompare );
 });
 
@@ -202,8 +205,9 @@ test('AvmOptimizer.parseOpcodeList(WhileTrue)', () => {
 test('AvmOptimizer.parseOpcodeList( SimpleCall )', () => {
   var avm = "51c56b6c766b00527ac46c766b00c361650700616c756651c56b6c766b00527ac451616c7566";
   var avmOut = "[(0:PUSH1:),(1:NEWARRAY:),(2:TOALTSTACK:),(3:FROMALTSTACK:),(4:DUP:),(5:TOALTSTACK:),(6:PUSH0:),(7:PUSH2:),(8:ROLL:),(9:SETITEM:),(10:FROMALTSTACK:),\
-(11:DUP:),(12:TOALTSTACK:),(13:PUSH0:),(14:PICKITEM:),(0:NOP:),(16:CALL:0700),(0:NOP:),(20:FROMALTSTACK:),(21:DROP:),(22:RET:),(23:PUSH1:),(24:NEWARRAY:),(25:TOALTSTACK:),\
-(26:FROMALTSTACK:),(27:DUP:),(28:TOALTSTACK:),(29:PUSH0:),(30:PUSH2:),(31:ROLL:),(32:SETITEM:),(33:PUSH1:),(0:NOP:),(35:FROMALTSTACK:),(36:DROP:),(37:RET:)]";
+(11:DUP:),(12:TOALTSTACK:),(13:PUSH0:),(14:PICKITEM:),(15:NOP:),(16:CALL:0700),(19:NOP:),(20:FROMALTSTACK:),(21:DROP:),(22:RET:),(23:PUSH1:),(24:NEWARRAY:),(25:TOALTSTACK:),\
+(26:FROMALTSTACK:),(27:DUP:),(28:TOALTSTACK:),(29:PUSH0:),(30:PUSH2:),(31:ROLL:),(32:SETITEM:),(33:PUSH1:),(34:NOP:),(35:FROMALTSTACK:),(36:DROP:),(37:RET:)]";
+
   var ops = [];
   AvmOptimizer.parseOpcodeList(avm, ops);
   //AvmOptimizer.computeJumpsFrom(ops);
@@ -219,13 +223,33 @@ test('AvmOptimizer.parseOpcodeList( SimpleCall )', () => {
   var opsJump = AvmOptimizer.parseJumpList(ops);
   var opsCompare = [[0, "PUSH1", [], []], [1, "NEWARRAY", [], []], [2, "TOALTSTACK", [], []], [3, "FROMALTSTACK", [], []], [4, "DUP", [], []], [5, "TOALTSTACK", [], []],
 [6, "PUSH0", [], []], [7, "PUSH2", [], []], [8, "ROLL", [], []], [9, "SETITEM", [], []], [10, "FROMALTSTACK", [], []], [11, "DUP", [], []], [12, "TOALTSTACK", [], []],
-[13, "PUSH0", [], []], [14, "PICKITEM", [], []], [0, "NOP", [], []], [16, "CALL", [], []], [0, "NOP", [], []], [20, "FROMALTSTACK", [], []], [21, "DROP", [], []],
-[22, "RET", [], []], [23, "PUSH1", [], [16]], [24, "NEWARRAY", [], []], [25, "TOALTSTACK", [], []], [26, "FROMALTSTACK", [], []], [27, "DUP", [], []],
-[28, "TOALTSTACK", [], []], [29, "PUSH0", [], []], [30, "PUSH2", [], []], [31, "ROLL", [], []], [32, "SETITEM", [], []], [33, "PUSH1", [], []], [0, "NOP", [], []],
-[35, "FROMALTSTACK", [], []], [36, "DROP", [], []], [37, "RET", [], []]];
+[13, "PUSH0", [], []], [14, "PICKITEM", [], []], [15, "NOP", [], []], [16, "CALL", [], []], [19, "NOP", [], []], [20, "FROMALTSTACK", [], []], [21, "DROP", [], []],
+[22, "RET", [], []], [23, "PUSH1", [], [16]], [24, "NEWARRAY", [], []], [25, "TOALTSTACK", [], []], [26, "FROMALTSTACK", [], []], [27, "DUP", [], []], [28, "TOALTSTACK", [], []],
+[29, "PUSH0", [], []], [30, "PUSH2", [], []], [31, "ROLL", [], []], [32, "SETITEM", [], []], [33, "PUSH1", [], []], [34, "NOP", [], []], [35, "FROMALTSTACK", [], []],
+[36, "DROP", [], []], [37, "RET", [], []]];
+
   expect( opsJump ).toEqual( opsCompare );
 });
 
+
+// =====================================================
+// Testing simplecall with if inside
+
+test('AvmOptimizer.parseOpcodeList( SimpleCall+If )', () => {
+  var avm = "51c56b6c766b00527ac46c766b00c361650700616c756651c56b6c766b00527ac46c766b00c35aa263080000616c756651616c7566";
+  var ops = [];
+  AvmOptimizer.parseOpcodeList(avm, ops);
+  var avmOut = "[(0:PUSH1:),(1:NEWARRAY:),(2:TOALTSTACK:),(3:FROMALTSTACK:),(4:DUP:),(5:TOALTSTACK:),(6:PUSH0:),(7:PUSH2:),(8:ROLL:),(9:SETITEM:),\
+(10:FROMALTSTACK:),(11:DUP:),(12:TOALTSTACK:),(13:PUSH0:),(14:PICKITEM:),(15:NOP:),(16:CALL:0700),(19:NOP:),(20:FROMALTSTACK:),(21:DROP:),(22:RET:),(23:PUSH1:),\
+(24:NEWARRAY:),(25:TOALTSTACK:),(26:FROMALTSTACK:),(27:DUP:),(28:TOALTSTACK:),(29:PUSH0:),(30:PUSH2:),(31:ROLL:),(32:SETITEM:),(33:FROMALTSTACK:),(34:DUP:),\
+(35:TOALTSTACK:),(36:PUSH0:),(37:PICKITEM:),(38:PUSH10:),(39:GTE:),(40:JMPIF:0800),(43:PUSH0:),(44:NOP:),(45:FROMALTSTACK:),(46:DROP:),(47:RET:),(48:PUSH1:),\
+(49:NOP:),(50:FROMALTSTACK:),(51:DROP:),(52:RET:)]";
+
+  var ops = [];
+  AvmOptimizer.parseOpcodeList(avm, ops);
+  //AvmOptimizer.computeJumpsFrom(ops);
+  expect( NeoOpcode.printList(ops) ).toBe(avmOut);
+});
 
 test('AvmOptimizer.parseOpcodeList( SimpleCall+If )', () => {
   var avm = "51c56b6c766b00527ac46c766b00c361650700616c756651c56b6c766b00527ac46c766b00c35aa263080000616c756651616c7566";
@@ -235,11 +259,11 @@ test('AvmOptimizer.parseOpcodeList( SimpleCall+If )', () => {
   var opsJump = AvmOptimizer.parseJumpList(ops);
   var opsCompare = [[0, "PUSH1", [], []], [1, "NEWARRAY", [], []], [2, "TOALTSTACK", [], []], [3, "FROMALTSTACK", [], []], [4, "DUP", [], []], [5, "TOALTSTACK", [], []],
 [6, "PUSH0", [], []], [7, "PUSH2", [], []], [8, "ROLL", [], []], [9, "SETITEM", [], []], [10, "FROMALTSTACK", [], []], [11, "DUP", [], []], [12, "TOALTSTACK", [], []],
-[13, "PUSH0", [], []], [14, "PICKITEM", [], []], [0, "NOP", [], []], [16, "CALL", [], []], [0, "NOP", [], []], [20, "FROMALTSTACK", [], []], [21, "DROP", [], []],
+[13, "PUSH0", [], []], [14, "PICKITEM", [], []], [15, "NOP", [], []], [16, "CALL", [], []], [19, "NOP", [], []], [20, "FROMALTSTACK", [], []], [21, "DROP", [], []],
 [22, "RET", [], []], [23, "PUSH1", [], [16]], [24, "NEWARRAY", [], []], [25, "TOALTSTACK", [], []], [26, "FROMALTSTACK", [], []], [27, "DUP", [], []], [28, "TOALTSTACK", [], []],
 [29, "PUSH0", [], []], [30, "PUSH2", [], []], [31, "ROLL", [], []], [32, "SETITEM", [], []], [33, "FROMALTSTACK", [], []], [34, "DUP", [], []], [35, "TOALTSTACK", [], []],
-[36, "PUSH0", [], []], [37, "PICKITEM", [], []], [38, "PUSH10", [], []], [39, "GTE", [], []], [40, "JMPIF", [], []], [43, "PUSH0", [], []], [0, "NOP", [], []],
-[45, "FROMALTSTACK", [], []], [46, "DROP", [], []], [47, "RET", [], []], [48, "PUSH1", [40], []], [0, "NOP", [], []], [50, "FROMALTSTACK", [], []], [51, "DROP", [], []],
+[36, "PUSH0", [], []], [37, "PICKITEM", [], []], [38, "PUSH10", [], []], [39, "GTE", [], []], [40, "JMPIF", [], []], [43, "PUSH0", [], []], [44, "NOP", [], []],
+[45, "FROMALTSTACK", [], []], [46, "DROP", [], []], [47, "RET", [], []], [48, "PUSH1", [40], []], [49, "NOP", [], []], [50, "FROMALTSTACK", [], []], [51, "DROP", [], []],
 [52, "RET", [], []]];
 
   expect( opsJump ).toEqual( opsCompare );

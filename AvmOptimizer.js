@@ -252,7 +252,7 @@ AvmOptimizer.parseOpcode = function(opcode, hexavm, oplist=[], opcounter=0) {
 		else if (opcode == "60")
 				oplist.push(new NeoOpcode(opcode, "PUSH16", "# The number 16 is pushed onto the stack.", "", opcounter));
 		else if (opcode == "61")
-				oplist.push(new NeoOpcode(opcode, "NOP", "# Does nothing."));
+				oplist.push(new NeoOpcode(opcode, "NOP", "# Does nothing.", "", opcounter));
 		else if (opcode == "62") {
 				strcomment = "# ";
 				var nparfunc = "" + hexavm[0] + hexavm[1] + hexavm[2] + hexavm[3];
