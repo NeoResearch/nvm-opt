@@ -22,6 +22,7 @@ function NeoOpcode(hexcode, opname, comment="", args="", byteline=0, objargs={})
 	 this.objargs = objargs; // object args
    this.size = 1+(args.length/2);
 	 this.byteline = byteline;
+   this.jumpsFrom = [];
 };
 
 NeoOpcode._construct = function(hexcode, opname, comment="", args="", byteline=0, objargs={}) {
@@ -467,6 +468,27 @@ AvmOptimizer.parseOpcode = function(opcode, hexavm, oplist=[], opcounter=0) {
 		}
 		return hexavm;
 };
+
+
+AvmOptimizer.computeJumpsFrom = function(ops) {
+
+  for(var i=0; i<ops.length; i++) {
+
+    if((ops[i].opname == "JMP") || (ops[i].opname == "JMPIF") || (ops[i].opname == "JMPIFNOT") || (ops[i].opname == "CALL")) {
+      var offset = AvmOptimizer.byteArray2ToInt16(AvmOptimizer.littleHexStringToBigByteArray(ops[i].args));
+      ops[ ops[i].byteline + offset ].jumpsFrom.push(ops[i].byteline);
+    }
+
+  }
+
+};
+
+AvmOptimizer.parseJumpList = function(ops) {
+  var opsJump = [];
+  for(var i=0; i<ops.length; i++)
+    opsJump.push(ops[i].jumpsFrom);
+  return opsJump;
+}
 
 //exports.AvmOptimizer = AvmOptimizer;
 module.exports = {

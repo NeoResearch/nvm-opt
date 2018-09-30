@@ -168,3 +168,25 @@ test('AvmOptimizer.parseOpcodeList(x<10 then true) - OLD OPTIMIZER (JMPIF:0600 S
   AvmOptimizer.parseOpcodeList(avm, ops);
   expect( NeoOpcode.printList(ops) ).toBe(avmOut);
 });
+
+
+// ================================================================
+//  computeJumpsFrom
+
+test('AvmOptimizer.computeJumpsFrom (x<10 then true)', () => {
+  var avm = "51c56b6c766b00527ac46c766b00c35aa263080051616c756600616c7566";
+  var ops = [];
+  AvmOptimizer.parseOpcodeList(avm, ops);
+  AvmOptimizer.computeJumpsFrom(ops);
+  var opsJump = AvmOptimizer.parseJumpList(ops);
+  expect( opsJump ).toEqual([[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [17], [], []]);
+});
+
+test('AvmOptimizer.parseOpcodeList(WhileTrue)', () => {
+  var avm = "00c56b620000";
+  var ops = [];
+  AvmOptimizer.parseOpcodeList(avm, ops);
+  AvmOptimizer.computeJumpsFrom(ops);
+  var opsJump = AvmOptimizer.parseJumpList(ops);
+  expect( opsJump ).toEqual([[], [], [], [3]]);
+});
