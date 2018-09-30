@@ -484,7 +484,7 @@ AvmOptimizer.computeJumpsFrom = function(ops) {
 
   for(var i=0; i<ops.length; i++) {
 
-    if((ops[i].opname == "JMP") || (ops[i].opname == "JMPIF") || (ops[i].opname == "JMPIFNOT") ) {
+    if((ops[i].opname == "JMP") || (ops[i].opname == "JMPIF") || (ops[i].opname == "JMPIFNOT") || (ops[i].opname == "THROWIFNOT") ) {
       var offset = AvmOptimizer.byteArray2ToInt16(AvmOptimizer.littleHexStringToBigByteArray(ops[i].args));
       AvmOptimizer.markJumpAt(ops, ops[i].byteline + offset, ops[i].byteline, true, false);
     } else if(ops[i].opname == "CALL") {
@@ -505,6 +505,7 @@ AvmOptimizer.parseJumpList = function(ops) {
   return opsJump;
 }
 
+// breaks receiving jumps in modules
 AvmOptimizer.breakJumpModules = function(_opsJumps) {
   var opsJumps = _opsJumps.slice(); // clone
   var opsModules = [];
@@ -515,7 +516,36 @@ AvmOptimizer.breakJumpModules = function(_opsJumps) {
       lastCut = i;
     }
   }
-  opsModules.push(opsJumps.slice(lastCut, opsJumps.length));
+  if(lastCut != opsJumps.length)
+    opsModules.push(opsJumps.slice(lastCut, opsJumps.length));
+  return opsModules;
+}
+
+// break all jumps in modules, receiving and departing
+AvmOptimizer.breakAllJumpModules = function(_opsJumps) {
+  var opsJumps = _opsJumps.slice(); // clone
+  var opsModules = [];
+  var lastCut = 0;
+  for(var i=0; i<opsJumps.length; i++) {
+    if((opsJumps[i][2].length > 0) || (opsJumps[i][3].length > 0)) {
+      opsModules.push(opsJumps.slice(lastCut,i));
+      lastCut = i;
+    }
+    if((opsJumps[i][1] == "JMP") || (opsJumps[i][1] == "JMPIF") || (opsJumps[i][1] == "JMPIFNOT") ||
+          (opsJumps[i][1] == "CALL") || (opsJumps[i][1] == "THROWIFNOT")) {
+      // cut before
+      if(lastCut != i) {
+        opsModules.push(opsJumps.slice(lastCut,i));
+        lastCut = i;
+      }
+      // cut exactly
+      opsModules.push(opsJumps.slice(lastCut,i+1));
+      lastCut = i+1;
+    }
+  }
+  // cut last
+  if(lastCut != opsJumps.length)
+    opsModules.push(opsJumps.slice(lastCut, opsJumps.length));
   return opsModules;
 }
 
