@@ -24,7 +24,6 @@ function NeoOpcode(hexcode, opname, comment="", args="", byteline=0, objargs={})
 	 this.byteline = byteline;
    this.jumpsFrom = [];
    this.callsFrom = [];
-   this.beforeIsRet = false;
 };
 
 NeoOpcode._construct = function(hexcode, opname, comment="", args="", byteline=0, objargs={}) {
@@ -484,8 +483,6 @@ AvmOptimizer.markJumpAt = function(ops, indexLine, indexFrom, isJump=false, isCa
 AvmOptimizer.computeJumpsFrom = function(ops) {
 
   for(var i=0; i<ops.length; i++) {
-    if((i > 0) && (ops[i-1].opname=="RET"))
-      ops[i].beforeIsRet = true;
 
     if((ops[i].opname == "JMP") || (ops[i].opname == "JMPIF") || (ops[i].opname == "JMPIFNOT") ) {
       var offset = AvmOptimizer.byteArray2ToInt16(AvmOptimizer.littleHexStringToBigByteArray(ops[i].args));
@@ -503,7 +500,7 @@ AvmOptimizer.computeJumpsFrom = function(ops) {
 AvmOptimizer.parseJumpList = function(ops) {
   var opsJump = [];
   for(var i=0; i<ops.length; i++) {
-    opsJump.push( [ops[i].byteline, ops[i].opname, ops[i].jumpsFrom, ops[i].callsFrom, ops[i].beforeIsRet] );
+    opsJump.push( [ops[i].byteline, ops[i].opname, ops[i].jumpsFrom, ops[i].callsFrom] );
   }
   return opsJump;
 }
