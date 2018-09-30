@@ -297,13 +297,10 @@ test('breakJumpModules (whileTrue)', () => {
   AvmOptimizer.computeJumpsFrom(ops);
   var opsJump = AvmOptimizer.parseJumpList(ops);
   var opsModules = AvmOptimizer.breakJumpModules(opsJump);
-  var opsCompare0 = [[0, "PUSH1", [], []], [1, "NEWARRAY", [], []], [2, "TOALTSTACK", [], []], [3, "FROMALTSTACK", [], []], [4, "DUP", [], []],
-[5, "TOALTSTACK", [], []], [6, "PUSH0", [], []], [7, "PUSH2", [], []], [8, "ROLL", [], []], [9, "SETITEM", [], []], [10, "FROMALTSTACK", [], []],
-[11, "DUP", [], []], [12, "TOALTSTACK", [], []], [13, "PUSH0", [], []], [14, "PICKITEM", [], []], [15, "PUSH10", [], []], [16, "GTE", [], []],
-[17, "JMPIF", [], []], [20, "PUSH1", [], []], [21, "NOP", [], []], [22, "FROMALTSTACK", [], []], [23, "DROP", [], []], [24, "RET", [], []]];
-  var opsCompare1 = [[25, "PUSH0", [17], []], [26, "NOP", [], []], [27, "FROMALTSTACK", [], []], [28, "DROP", [], []], [29, "RET", [], []]];
+  var opsCompare0 = [[0, "PUSH0", [], []], [1, "NEWARRAY", [], []], [2, "TOALTSTACK", [], []]];
+  var opsCompare1 = [[3, "JMP", [3], []]];
 
-  expect( opsModules.length ).toEqual( 1 );
+  expect( opsModules.length ).toEqual( 2 );
   expect( opsModules[0] ).toEqual( opsCompare0 );
   expect( opsModules[1] ).toEqual( opsCompare1 );
 });

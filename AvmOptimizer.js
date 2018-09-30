@@ -515,8 +515,7 @@ AvmOptimizer.breakJumpModules = function(_opsJumps) {
       lastCut = i;
     }
   }
-  if(lastCut != opsJumps.length-1)
-    opsModules.push(opsJumps.slice(lastCut, opsJumps.length));
+  opsModules.push(opsJumps.slice(lastCut, opsJumps.length));
   return opsModules;
 }
 
