@@ -505,6 +505,21 @@ AvmOptimizer.parseJumpList = function(ops) {
   return opsJump;
 }
 
+AvmOptimizer.breakJumpModules = function(_opsJumps) {
+  var opsJumps = _opsJumps.slice(); // clone
+  var opsModules = [];
+  var lastCut = 0;
+  for(var i=0; i<opsJumps.length; i++) {
+    if((opsJumps[i][2].length > 0) || (opsJumps[i][3].length > 0)) {
+      opsModules.push(opsJumps.slice(lastCut,i));
+      lastCut = i;
+    }
+  }
+  if(lastCut != opsJumps.length-1)
+    opsModules.push(opsJumps.slice(lastCut, opsJumps.length));
+  return opsModules;
+}
+
 //exports.AvmOptimizer = AvmOptimizer;
 module.exports = {
 	AvmOptimizer,
