@@ -327,7 +327,7 @@ AvmOptimizer.parseOpcode = function(opcode, hexavm, oplist=[], opcounter=0) {
 				oplist.push(new NeoOpcode(opcode, opname, strcomment, codecall, opcounter));
 		}
 		else if (opcode == "6a")
-				oplist.push(new NeoOpcode(opcode, "DUPFROMALTSTACK", "#", "", opcounter));
+				oplist.push(new NeoOpcode(opcode, "DUPFROMALTSTACK", "# clone top element from altstack to mainstack", "", opcounter));
 		else if (opcode == "6b")
 				oplist.push(new NeoOpcode(opcode, "TOALTSTACK", "# Puts the input onto the top of the alt stack. Removes it from the main stack.", "", opcounter));
 		else if (opcode == "6c")
