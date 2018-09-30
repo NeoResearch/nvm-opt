@@ -288,6 +288,7 @@ test('breakJumpModules (x<10 then true)', () => {
   expect( opsModules.length ).toEqual( 2 );
   expect( opsModules[0] ).toEqual( opsCompare0 );
   expect( opsModules[1] ).toEqual( opsCompare1 );
+  expect( AvmOptimizer.joinListModules(opsModules) ).toEqual( opsJump );
 });
 
 test('breakJumpModules (whileTrue)', () => {
@@ -303,6 +304,7 @@ test('breakJumpModules (whileTrue)', () => {
   expect( opsModules.length ).toEqual( 2 );
   expect( opsModules[0] ).toEqual( opsCompare0 );
   expect( opsModules[1] ).toEqual( opsCompare1 );
+  expect( AvmOptimizer.joinListModules(opsModules) ).toEqual( opsJump );
 });
 
 
@@ -321,4 +323,31 @@ test('breakJumpModules (x<10 then true) - OLD OPTIMIZER (JMPIF:0600 SEEMS WRONG!
   expect( opsModules.length ).toEqual( 2 );
   expect( opsModules[0] ).toEqual( opsCompare0 );
   expect( opsModules[1] ).toEqual( opsCompare1 );
+  expect( AvmOptimizer.joinListModules(opsModules) ).toEqual( opsJump );
+});
+
+
+test('breakJumpModules ( SimpleCall+If )', () => {
+  var avm = "51c56b6c766b00527ac46c766b00c361650700616c756651c56b6c766b00527ac46c766b00c35aa263080000616c756651616c7566";
+  var ops = [];
+  AvmOptimizer.parseOpcodeList(avm, ops);
+  AvmOptimizer.computeJumpsFrom(ops);
+  var opsJump = AvmOptimizer.parseJumpList(ops);
+  var opsModules = AvmOptimizer.breakJumpModules(opsJump);
+  var opsCompare0 = [[0, "PUSH1", [], []], [1, "NEWARRAY", [], []], [2, "TOALTSTACK", [], []], [3, "FROMALTSTACK", [], []], [4, "DUP", [], []],
+[5, "TOALTSTACK", [], []], [6, "PUSH0", [], []], [7, "PUSH2", [], []], [8, "ROLL", [], []], [9, "SETITEM", [], []], [10, "FROMALTSTACK", [], []],
+[11, "DUP", [], []], [12, "TOALTSTACK", [], []], [13, "PUSH0", [], []], [14, "PICKITEM", [], []], [15, "NOP", [], []], [16, "CALL", [], []],
+[19, "NOP", [], []], [20, "FROMALTSTACK", [], []], [21, "DROP", [], []], [22, "RET", [], []]];
+  var opsCompare1 = [[23, "PUSH1", [], [16]], [24, "NEWARRAY", [], []], [25, "TOALTSTACK", [], []], [26, "FROMALTSTACK", [], []], [27, "DUP", [], []],
+[28, "TOALTSTACK", [], []], [29, "PUSH0", [], []], [30, "PUSH2", [], []], [31, "ROLL", [], []], [32, "SETITEM", [], []], [33, "FROMALTSTACK", [], []],
+[34, "DUP", [], []], [35, "TOALTSTACK", [], []], [36, "PUSH0", [], []], [37, "PICKITEM", [], []], [38, "PUSH10", [], []], [39, "GTE", [], []],
+[40, "JMPIF", [], []], [43, "PUSH0", [], []], [44, "NOP", [], []], [45, "FROMALTSTACK", [], []], [46, "DROP", [], []], [47, "RET", [], []]];
+  var opsCompare2 = [[48, "PUSH1", [40], []], [49, "NOP", [], []], [50, "FROMALTSTACK", [], []], [51, "DROP", [], []], [52, "RET", [], []]];
+
+  expect( opsModules.length ).toEqual( 3 );
+  expect( opsModules[0] ).toEqual( opsCompare0 );
+  expect( opsModules[1] ).toEqual( opsCompare1 );
+  expect( opsModules[2] ).toEqual( opsCompare2 );
+  expect( AvmOptimizer.joinListModules(opsModules) ).toEqual( opsJump );
+
 });

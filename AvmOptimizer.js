@@ -519,6 +519,14 @@ AvmOptimizer.breakJumpModules = function(_opsJumps) {
   return opsModules;
 }
 
+AvmOptimizer.joinListModules = function(opsModules) {
+  var opsJumps = [];
+  for(var i=0; i<opsModules.length; i++)
+    for(var j=0; j<opsModules[i].length; j++)
+      opsJumps.push(opsModules[i][j]);
+  return opsJumps;
+}
+
 //exports.AvmOptimizer = AvmOptimizer;
 module.exports = {
 	AvmOptimizer,
