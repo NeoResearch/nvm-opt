@@ -147,3 +147,22 @@ test('AvmOptimizer.parseOpcodeList(WhileTrue)', () => {
   AvmOptimizer.parseOpcodeList(avm, ops);
   expect( NeoOpcode.printList(ops) ).toBe(avmOut);
 });
+
+test('AvmOptimizer.parseOpcodeList(x<10 then true) - OPTIMIZER (SEEMS WRONG!)', () => {
+  var avm = "51c56b6a00527ac46a00c35aa2630600516c7566006c7566";
+  var avmOut = "[(0:PUSH1:),(1:NEWARRAY:),(2:TOALTSTACK:),(3:DUPFROMALTSTACK:),(4:PUSH0:),(5:PUSH2:),(6:ROLL:),(7:SETITEM:),(8:DUPFROMALTSTACK:),(9:PUSH0:),\
+(10:PICKITEM:),(11:PUSH10:),(12:GTE:),(13:JMPIF:0600),(16:PUSH1:),(17:FROMALTSTACK:),(18:DROP:),(19:RET:),(20:PUSH0:),(21:FROMALTSTACK:),(22:DROP:),(23:RET:)]";
+  var ops = [];
+  AvmOptimizer.parseOpcodeList(avm, ops);
+  expect( NeoOpcode.printList(ops) ).toBe(avmOut);
+});
+
+test('AvmOptimizer.parseOpcodeList(x<10 then true)', () => {
+  var avm = "51c56b6c766b00527ac46c766b00c35aa263080051616c756600616c7566";
+  var avmOut = "[(0:PUSH1:),(1:NEWARRAY:),(2:TOALTSTACK:),(3:FROMALTSTACK:),(4:DUP:),(5:TOALTSTACK:),(6:PUSH0:),(7:PUSH2:),(8:ROLL:),(9:SETITEM:),(10:FROMALTSTACK:),\
+(11:DUP:),(12:TOALTSTACK:),(13:PUSH0:),(14:PICKITEM:),(15:PUSH10:),(16:GTE:),(17:JMPIF:0800),(20:PUSH1:),(0:NOP:),(22:FROMALTSTACK:),(23:DROP:),(24:RET:),(25:PUSH0:),\
+(0:NOP:),(27:FROMALTSTACK:),(28:DROP:),(29:RET:)]";
+  var ops = [];
+  AvmOptimizer.parseOpcodeList(avm, ops);
+  expect( NeoOpcode.printList(ops) ).toBe(avmOut);
+});
