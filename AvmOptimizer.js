@@ -251,6 +251,9 @@ AvmOptimizer.parseOpcode = function(opcode, hexavm, oplist=[], opcounter=0) {
 				oplist.push(new NeoOpcode(opcode, "PUSH15", "# The number 15 is pushed onto the stack.", "", opcounter));
 		else if (opcode == "60")
 				oplist.push(new NeoOpcode(opcode, "PUSH16", "# The number 16 is pushed onto the stack.", "", opcounter));
+    // ======================
+    //       Control
+    // ======================
 		else if (opcode == "61")
 				oplist.push(new NeoOpcode(opcode, "NOP", "# Does nothing.", "", opcounter));
 		else if (opcode == "62") {
@@ -326,6 +329,9 @@ AvmOptimizer.parseOpcode = function(opcode, hexavm, oplist=[], opcounter=0) {
 				//target.val(target.val() + codecall + "\n");
 				oplist.push(new NeoOpcode(opcode, opname, strcomment, codecall, opcounter));
 		}
+    // =============================
+    //          Stack ops
+    // =============================
 		else if (opcode == "6a")
 				oplist.push(new NeoOpcode(opcode, "DUPFROMALTSTACK", "# clone top element from altstack to mainstack", "", opcounter));
 		else if (opcode == "6b")
@@ -333,11 +339,11 @@ AvmOptimizer.parseOpcode = function(opcode, hexavm, oplist=[], opcounter=0) {
 		else if (opcode == "6c")
 				oplist.push(new NeoOpcode(opcode, "FROMALTSTACK", "# Puts the input onto the top of the main stack. Removes it from the alt stack.", "", opcounter));
 		else if (opcode == "6d")
-				oplist.push(new NeoOpcode(opcode, "XDROP", "#", "", opcounter));
+				oplist.push(new NeoOpcode(opcode, "XDROP", "# The item n back in the main stack is removed.", "", opcounter));
 		else if (opcode == "72")
-				oplist.push(new NeoOpcode(opcode, "XSWAP", "#", "", opcounter));
+				oplist.push(new NeoOpcode(opcode, "XSWAP", "# The item n back in the main stack in swapped with top stack item.", "", opcounter));
 		else if (opcode == "73")
-				oplist.push(new NeoOpcode(opcode, "XTUCK", "#", "", opcounter));
+				oplist.push(new NeoOpcode(opcode, "XTUCK", "# The item on top of the main stack is copied and inserted to the position n in the main stack.", "", opcounter));
 		else if (opcode == "74")
 				oplist.push(new NeoOpcode(opcode, "DEPTH", "# Puts the number of stack items onto the stack.", "", opcounter));
 		else if (opcode == "75")
@@ -358,6 +364,11 @@ AvmOptimizer.parseOpcode = function(opcode, hexavm, oplist=[], opcounter=0) {
 				oplist.push(new NeoOpcode(opcode, "SWAP", "# The top two items on the stack are swapped.", "", opcounter));
 		else if (opcode == "7d")
 				oplist.push(new NeoOpcode(opcode, "TUCK", "# The item at the top of the stack is copied and inserted before the second-to-top item.", "", opcounter));
+
+    // ===============================
+    //              SPLICE
+    // ===============================
+
 		else if (opcode == "7e")
 				oplist.push(new NeoOpcode(opcode, "CAT", "# Concatenates two strings.", "", opcounter));
 		else if (opcode == "7f")
@@ -368,6 +379,11 @@ AvmOptimizer.parseOpcode = function(opcode, hexavm, oplist=[], opcounter=0) {
 				oplist.push(new NeoOpcode(opcode, "RIGHT", "# Keeps only characters right of the specified point in a string.", "", opcounter));
 		else if (opcode == "82")
 				oplist.push(new NeoOpcode(opcode, "SIZE", "# Returns the length of the input string.", "", opcounter));
+
+    // ================================
+    //        bitwise logic
+    // ================================
+
 		else if (opcode == "83")
 				oplist.push(new NeoOpcode(opcode, "INVERT", "# Flips all of the bits in the input.", "", opcounter));
 		else if (opcode == "84")
@@ -378,12 +394,17 @@ AvmOptimizer.parseOpcode = function(opcode, hexavm, oplist=[], opcounter=0) {
 				oplist.push(new NeoOpcode(opcode, "XOR", "# Boolean exclusive or between each bit in the inputs.", "", opcounter));
 		else if (opcode == "87")
 				oplist.push(new NeoOpcode(opcode, "EQUAL", "# Returns 1 if the inputs are exactly equal, 0 otherwise.", "", opcounter));
+
+    // ================================
+    //         Numeric
+    // ================================
+
 		else if (opcode == "8b")
 				oplist.push(new NeoOpcode(opcode, "INC", "# 1 is added to the input.", "", opcounter));
 		else if (opcode == "8c")
 				oplist.push(new NeoOpcode(opcode, "DEC", "# 1 is subtracted from the input.", "", opcounter));
 		else if (opcode == "8d")
-				oplist.push(new NeoOpcode(opcode, "SIGN", "#", "", opcounter));
+				oplist.push(new NeoOpcode(opcode, "SIGN", "# Puts the sign of top stack item on top of the main stack. If value is negative, put -1; if positive, put 1; if value is zero, put 0.", "", opcounter));
 		else if (opcode == "8f")
 				oplist.push(new NeoOpcode(opcode, "NEGATE", "# The sign of the input is flipped.", "", opcounter));
 		else if (opcode == "90")
@@ -428,6 +449,11 @@ AvmOptimizer.parseOpcode = function(opcode, hexavm, oplist=[], opcounter=0) {
 				oplist.push(new NeoOpcode(opcode, "MAX", "# Returns the larger of a and b.", "", opcounter));
 		else if (opcode == "a5")
 				oplist.push(new NeoOpcode(opcode, "WITHIN", "# Returns 1 if x is within the specified range (left-inclusive), 0 otherwise.", "", opcounter));
+
+    // ================================
+    //           crypto
+    // ================================
+
 		else if (opcode == "a7")
 				oplist.push(new NeoOpcode(opcode, "SHA1", "# The input is hashed using SHA-1.", "", opcounter));
 		else if (opcode == "a8")
@@ -437,29 +463,90 @@ AvmOptimizer.parseOpcode = function(opcode, hexavm, oplist=[], opcounter=0) {
 		else if (opcode == "aa")
 				oplist.push(new NeoOpcode(opcode, "HASH256", "# The input is hashed using HASH256.", "", opcounter));
 		else if (opcode == "ac")
-				oplist.push(new NeoOpcode(opcode, "CHECKSIG", "#", "", opcounter));
+				oplist.push(new NeoOpcode(opcode, "CHECKSIG", "# The publickey and signature are taken from main stack. Verifies if transaction was signed by given publickey and a boolean output is put on top of the main stack.", "", opcounter));
+    else if (opcode == "ad")
+        oplist.push(new NeoOpcode(opcode, "VERIFY", "# The publickey, signature and message are taken from main stack. Verifies if given message was signed by given publickey and a boolean output is put on top of the main stack.", "", opcounter));
 		else if (opcode == "ae")
-				oplist.push(new NeoOpcode(opcode, "CHECKMULTISIG", "#", "", opcounter));
+				oplist.push(new NeoOpcode(opcode, "CHECKMULTISIG", "# A set of n public keys (an array or value n followed by n pubkeys) is validated against a set of m signatures (an array or value m followed by m signatures).", "", opcounter));
+
+    // ================================
+    //           Array
+    // ================================
+
 		else if (opcode == "c0")
-				oplist.push(new NeoOpcode(opcode, "ARRAYSIZE", "#", "", opcounter));
+				oplist.push(new NeoOpcode(opcode, "ARRAYSIZE", "# An array is removed from top of the main stack. Its size is put on top of the main stack.", "", opcounter));
 		else if (opcode == "c1")
-				oplist.push(new NeoOpcode(opcode, "PACK", "#", "", opcounter));
+				oplist.push(new NeoOpcode(opcode, "PACK", "# A value n is taken from top of main stack. The next n items on main stack are removed, put inside n-sized array and this array is put on top of the main stack.", "", opcounter));
 		else if (opcode == "c2")
-				oplist.push(new NeoOpcode(opcode, "UNPACK", "#", "", opcounter));
+				oplist.push(new NeoOpcode(opcode, "UNPACK", "# An array is removed from top of the main stack. Its elements are put on top of the main stack (in reverse order) and the array size is also put on main stack.", "", opcounter));
 		else if (opcode == "c3")
-				oplist.push(new NeoOpcode(opcode, "PICKITEM", "#", "", opcounter));
+				oplist.push(new NeoOpcode(opcode, "PICKITEM", "# An input index n (or key) and an array (or map) are taken from main stack. Element array[n] (or map[n]) is put on top of the main stack.", "", opcounter));
 		else if (opcode == "c4")
-				oplist.push(new NeoOpcode(opcode, "SETITEM", "#", "", opcounter));
+				oplist.push(new NeoOpcode(opcode, "SETITEM", "#  A value v, index n (or key) and an array (or map) are taken from main stack. Attribution array[n]=v (or map[n]=v) is performed.", "", opcounter));
 		else if (opcode == "c5")
-				oplist.push(new NeoOpcode(opcode, "NEWARRAY", "#", "", opcounter));
+				oplist.push(new NeoOpcode(opcode, "NEWARRAY", "#  A value n is taken from top of main stack. A zero-filled array type with size n is put on top of the main stack.", "", opcounter));
 		else if (opcode == "c6")
-				oplist.push(new NeoOpcode(opcode, "NEWSTRUCT", "#", "", opcounter));
+				oplist.push(new NeoOpcode(opcode, "NEWSTRUCT", "#  A value n is taken from top of main stack. A zero-filled struct type with size n is put on top of the main stack.", "", opcounter));
+    else if (opcode == "c7")
+				oplist.push(new NeoOpcode(opcode, "NEWMAP", "# A Map is created and put on top of the main stack.", "", opcounter));
 		else if (opcode == "c8")
-				oplist.push(new NeoOpcode(opcode, "APPEND", "#", "", opcounter));
+				oplist.push(new NeoOpcode(opcode, "APPEND", "# The item on top of main stack is removed and appended to the second item on top of the main stack.", "", opcounter));
 		else if (opcode == "c9")
-				oplist.push(new NeoOpcode(opcode, "REVERSE", "#", "", opcounter));
+				oplist.push(new NeoOpcode(opcode, "REVERSE", "# An array is removed from the top of the main stack and its elements are reversed.", "", opcounter));
 		else if (opcode == "ca")
-				oplist.push(new NeoOpcode(opcode, "REMOVE", "#", "", opcounter));
+				oplist.push(new NeoOpcode(opcode, "REMOVE", "# An input index n (or key) and an array (or map) are removed from the top of the main stack. Element array[n] (or map[n]) is removed.", "", opcounter));
+    else if (opcode == "cb")
+				oplist.push(new NeoOpcode(opcode, "HASKEY", "# An input index n (or key) and an array (or map) are removed from the top of the main stack. Puts True on top of main stack if array[n] (or map[n]) exist, and False otherwise.", "", opcounter));
+    else if (opcode == "cc")
+				oplist.push(new NeoOpcode(opcode, "KEYS", "# A map is taken from top of the main stack. The keys of this map are put on top of the main stack.", "", opcounter));
+    else if (opcode == "cd")
+				oplist.push(new NeoOpcode(opcode, "VALUES", "# A map is taken from top of the main stack. The values of this map are put on top of the main stack.", "", opcounter));
+
+    // ================================
+    //        Stack Isolation
+    // ================================
+
+    else if (opcode == "e0") {
+			 strcomment = "# ";
+       var param1 = "" + hexavm[0] + hexavm[1];
+       var param2 = "" + hexavm[2] + hexavm[3];
+			 var nparfunc = "" + hexavm[4] + hexavm[5] + hexavm[6] + hexavm[7];
+			 hexavm = hexavm.substr(8, hexavm.length);
+			 strcomment += ""+params+" "+AvmOptimizer.byteArray2ToInt16(AvmOptimizer.littleHexStringToBigByteArray(nparfunc, opcounter));
+			 oplist.push(new NeoOpcode(opcode, "CALL_I", strcomment, nparfunc, opcounter));
+			 //oplist.push(new NeoOpcode(opcode, "CALL", "#", "", opcounter));
+		}
+    else if ((opcode == "e1") || (opcode == "e2") || (opcode == "e3") || (opcode == "e4")) {  // read 20 bytes in reverse order
+        strcomment = "# ";
+				var opname = "";
+				if (opcode == "e1")
+						opname = "CALL_E";
+        if (opcode == "e2")
+						opname = "CALL_ED";
+        if (opcode == "e3")
+						opname = "CALL_ET";
+        if (opcode == "e4")
+						opname = "CALL_EDT";
+
+        var param1 = "" + hexavm[0] + hexavm[1];
+        var param2 = "" + hexavm[1] + hexavm[2];
+        strcomment += ""+param1 + param2;
+        hexavm = hexavm.substr(4, hexavm.length);
+				var codecall = "";
+				for (i = 0; i < 20; i++) {
+						var codepush = "" + hexavm[0] + hexavm[1];
+						hexavm = hexavm.substr(2, hexavm.length);
+						//codecall = codepush + codecall;
+						codecall += codepush;
+				}
+				//target.val(target.val() + codecall + "\n");
+				oplist.push(new NeoOpcode(opcode, opname, strcomment, codecall, opcounter));
+		}
+
+    // ==========================
+    //        exceptions
+    // ==========================
+
 		else if (opcode == "f0")
 				oplist.push(new NeoOpcode(opcode, "THROW", "#", "", opcounter));
 		else if (opcode == "f1")
