@@ -550,3 +550,90 @@ test('breakAllJumpModules  (factorial 10)', () => {
   expect( opsModules[8] ).toEqual( opsCompare8 );
   expect( AvmOptimizer.joinListModules(opsModules) ).toEqual( opsJump );
 });
+
+
+test('breakAllJumpModules  (x<20 throw)', () => {
+  var avm = "51c56b6c766b00527ac46c766b00c30114a263050061f06c766b00c3616c7566";
+  var ops = [];
+  AvmOptimizer.parseOpcodeList(avm, ops);
+  AvmOptimizer.computeJumpsFrom(ops);
+  var opsJump = AvmOptimizer.parseJumpList(ops);
+  var opsModules = AvmOptimizer.breakAllJumpModules(opsJump);
+  var opsCompare0 = [[0, "PUSH1", [], []], [1, "NEWARRAY", [], []], [2, "TOALTSTACK", [], []], [3, "FROMALTSTACK", [], []], [4, "DUP", [], []],
+[5, "TOALTSTACK", [], []], [6, "PUSH0", [], []], [7, "PUSH2", [], []], [8, "ROLL", [], []], [9, "SETITEM", [], []], [10, "FROMALTSTACK", [], []],
+[11, "DUP", [], []], [12, "TOALTSTACK", [], []], [13, "PUSH0", [], []], [14, "PICKITEM", [], []], [15, "PUSHBYTES1", [], []], [17, "GTE", [], []]];
+  var opsCompare1 = [[18, "JMPIF", [], []]]
+  var opsCompare2 = [[21, "NOP", [], []], [22, "THROW", [], []]];
+  var opsCompare3 = [[23, "FROMALTSTACK", [18], []], [24, "DUP", [], []], [25, "TOALTSTACK", [], []], [26, "PUSH0", [], []], [27, "PICKITEM", [], []],
+[28, "NOP", [], []], [29, "FROMALTSTACK", [], []], [30, "DROP", [], []], [31, "RET", [], []]];
+
+  var avmOut = "[(0:PUSH1:),(1:NEWARRAY:),(2:TOALTSTACK:),(3:FROMALTSTACK:),(4:DUP:),(5:TOALTSTACK:),(6:PUSH0:),(7:PUSH2:),(8:ROLL:),(9:SETITEM:),\
+(10:FROMALTSTACK:),(11:DUP:),(12:TOALTSTACK:),(13:PUSH0:),(14:PICKITEM:),(15:PUSHBYTES1:14),(17:GTE:),(18:JMPIF:0500),(21:NOP:),(22:THROW:),\
+(23:FROMALTSTACK:),(24:DUP:),(25:TOALTSTACK:),(26:PUSH0:),(27:PICKITEM:),(28:NOP:),(29:FROMALTSTACK:),(30:DROP:),(31:RET:)]";
+
+  expect( NeoOpcode.printList(ops) ).toBe(avmOut);
+  expect( opsModules.length ).toEqual( 4 );
+  expect( opsModules[0] ).toEqual( opsCompare0 );
+  expect( opsModules[1] ).toEqual( opsCompare1 );
+  expect( opsModules[2] ).toEqual( opsCompare2 );
+  expect( opsModules[3] ).toEqual( opsCompare3 );
+  expect( AvmOptimizer.joinListModules(opsModules) ).toEqual( opsJump );
+});
+
+// ========================================================================
+// generateFlowChartFromModules
+
+test('generateFlowChartFromModules  (x<20 throw)', () => {
+  var avm = "51c56b6c766b00527ac46c766b00c30114a263050061f06c766b00c3616c7566";
+  var ops = [];
+  AvmOptimizer.parseOpcodeList(avm, ops);
+  AvmOptimizer.computeJumpsFrom(ops);
+  var opsJump = AvmOptimizer.parseJumpList(ops);
+  var opsModules = AvmOptimizer.breakAllJumpModules(opsJump);
+
+  var fcCode = "input=>start: Start Script|past\n\
+ret=>end: RET|approved\n\
+throw=>end: THROW|rejected\n\
+none=>end: NONE|approved\n\
+Line0=>operation: 0:PUSH1\n\
+1:NEWARRAY\n\
+2:TOALTSTACK\n\
+3:FROMALTSTACK\n\
+4:DUP\n\
+5:TOALTSTACK\n\
+6:PUSH0\n\
+7:PUSH2\n\
+8:ROLL\n\
+9:SETITEM\n\
+10:FROMALTSTACK\n\
+11:DUP\n\
+12:TOALTSTACK\n\
+13:PUSH0\n\
+14:PICKITEM\n\
+15:PUSHBYTES1\n\
+17:GTE\n\
+|future\n\
+Line18=>condition: 18:JMPIF\n\
+|future\n\
+Line21=>operation: 21:NOP\n\
+22:THROW\n\
+|future\n\
+Line23=>operation: 23:FROMALTSTACK\n\
+24:DUP\n\
+25:TOALTSTACK\n\
+26:PUSH0\n\
+27:PICKITEM\n\
+28:NOP\n\
+29:FROMALTSTACK\n\
+30:DROP\n\
+31:RET\n\
+|future\n\
+input->Line0\n\
+Line0->Line18\n\
+Line18(no)->Line21\n\
+Line18(yes)->Line23\n\
+Line21->throw\n\
+Line23->ret\n";
+
+  expect( AvmOptimizer.generateFlowChartFromModules(opsModules, opsJump, ops) ).toEqual( fcCode );
+});

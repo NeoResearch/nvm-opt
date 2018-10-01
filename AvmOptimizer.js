@@ -549,6 +549,7 @@ AvmOptimizer.breakAllJumpModules = function(_opsJumps) {
   return opsModules;
 }
 
+// merge the modular list to single list
 AvmOptimizer.joinListModules = function(opsModules) {
   var opsJumps = [];
   for(var i=0; i<opsModules.length; i++)
@@ -556,6 +557,92 @@ AvmOptimizer.joinListModules = function(opsModules) {
       opsJumps.push(opsModules[i][j]);
   return opsJumps;
 }
+
+// find index line on array v
+AvmOptimizer.findOnArray = function(line, v) {
+  for(var i=0; i<v.length; i++)
+    if(v[i]==line)
+      return true;
+  return false;
+}
+
+AvmOptimizer.findLineOnOplist = function(line, opsJumps) {
+  for(var i=0; i<opsJumps.length; i++)
+    if(AvmOptimizer.findOnArray(line, opsJumps[i][2]) || AvmOptimizer.findOnArray(line, opsJumps[i][3]))
+      return opsJumps[i][0];
+  return -1;
+}
+
+// generate a flowchart.js based on modular list 'opsModules', merged list 'opsJumps' and raw operation list 'ops'
+AvmOptimizer.generateFlowChartFromModules = function(opsModules, opsJumps, ops, ellipseContent=false) {
+  var fcCode = "";
+  fcCode += "input=>start: Start Script|past\n\
+ret=>end: RET|approved\n\
+throw=>end: THROW|rejected\n\
+none=>end: NONE|approved\n";
+  // create header
+  for(var i=0; i<opsModules.length; i++)
+  {
+    fcCode += "Line"+(opsModules[i][0][0])+"=>";
+    if((opsModules[i].length==1) && ((opsModules[i][0][1]=="JMP") || (opsModules[i][0][1]=="JMPIF") || (opsModules[i][0][1]=="JMPIFNOT") ||
+         (opsModules[i][0][1]=="CALL") || (opsModules[i][0][1]=="THROWIFNOT")))
+    {
+      fcCode += "condition: ";
+    }
+    else
+      fcCode += "operation: ";
+    // put content in operation/condition
+    for(var j=0; j<opsModules[i].length; j++)
+      fcCode += opsModules[i][j][0]+":"+opsModules[i][j][1]+"\n";
+    fcCode += "|future\n";
+  }
+  // connections on blocks
+  fcCode += "input->Line0\n";
+  for(var i=0; i<opsModules.length; i++)
+  {
+    var lastOp = opsModules[i].length-1;
+
+    if( (opsModules[i].length==1) && ((opsModules[i][0][1]=="JMP") || (opsModules[i][0][1]=="JMPIF") || (opsModules[i][0][1]=="JMPIFNOT") ||
+         (opsModules[i][0][1]=="CALL") || (opsModules[i][0][1]=="THROWIFNOT"))
+      )
+    {
+      fcCode += "Line"+(opsModules[i][0][0])+"(no)->";
+
+      // compute "no": check if last is RET, THROW or just next Line
+      if(opsModules[i][lastOp][1]=="RET")
+        fcCode += "ret\n";
+      else if (opsModules[i][lastOp][1]=="THROW")
+        fcCode += "throw\n";
+      else if (i == opsModules.length-1) // last line already
+        fcCode += "none\n";
+      else
+        fcCode += "Line"+opsModules[i+1][0][0]+"\n";
+
+      // compute "yes": find operation that references this one
+      fcCode += "Line"+(opsModules[i][0][0])+"(yes)->";
+      var idxLine = AvmOptimizer.findLineOnOplist(opsModules[i][0][0], opsJumps);
+      if(idxLine < 0)
+        fcCode += "ERROR_Line_Not_Found\n";
+      else
+        fcCode += "Line"+idxLine+"\n";
+    }
+    else  // basic operation (not condition)
+    {
+      fcCode += "Line"+(opsModules[i][0][0])+"->";
+      if(opsModules[i][lastOp][1]=="RET")
+        fcCode += "ret\n";
+      else if (opsModules[i][lastOp][1]=="THROW")
+        fcCode += "throw\n";
+      else if (i == opsModules.length-1) // last line already
+        fcCode += "none\n";
+      else
+        fcCode += "Line"+opsModules[i+1][0][0]+"\n";
+    }
+  }
+
+  return fcCode;
+}
+
 
 //exports.AvmOptimizer = AvmOptimizer;
 module.exports = {
