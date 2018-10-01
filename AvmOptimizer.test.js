@@ -718,3 +718,17 @@ Line102->ret\n";
 
   expect( AvmOptimizer.generateFlowChartFromModules(opsModules, opsJump, ops, false) ).toEqual( fcCode );
 });
+
+
+// ============================================================
+//  testing optimizations
+
+test('getAVMFromList - HelloWorld: Runtime.Notify("oi")', () => {
+  var avm = "00c56b51c57600026f69c46168124e656f2e52756e74696d652e4e6f74696679616c7566";
+  var avmOut = "[(0:PUSH0:),(1:NEWARRAY:),(2:TOALTSTACK:),(3:PUSH1:),(4:NEWARRAY:),(5:DUP:),(6:PUSH0:),(7:PUSHBYTES2:6f69),(10:SETITEM:),\
+(11:NOP:),(12:SYSCALL:124e656f2e52756e74696d652e4e6f74696679),(32:NOP:),(33:FROMALTSTACK:),(34:DROP:),(35:RET:)]";
+
+  var ops = [];
+  AvmOptimizer.parseOpcodeList(avm, ops);
+  expect( NeoOpcode.printList(ops) ).toBe(avmOut);
+});
