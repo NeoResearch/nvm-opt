@@ -740,3 +740,15 @@ test('getAVMFromList - HelloWorld: Runtime.Notify("oi")', () => {
   expect( NeoOpcode.printList(ops) ).toBe(avmOut);
   expect( AvmOptimizer.verifyLineNumbers(ops)).toBe(true);
 });
+
+test('getAVMFromList - HelloWorld: Runtime.Notify("oi") - optimized', () => {
+  var avm = "00c56b51c57600026f69c46168124e656f2e52756e74696d652e4e6f74696679616c7566";
+  var avmOut = "[(0:PUSH0:),(1:NEWARRAY:),(2:TOALTSTACK:),(3:PUSH1:),(4:NEWARRAY:),(5:DUP:),(6:PUSH0:),(7:PUSHBYTES2:6f69),(10:SETITEM:),\
+(11:SYSCALL:124e656f2e52756e74696d652e4e6f74696679),(31:FROMALTSTACK:),(32:DROP:),(33:RET:)]";
+
+  var ops = [];
+  AvmOptimizer.parseOpcodeList(avm, ops);
+  AvmOptimizer.optimizeAVM(ops);
+  expect( NeoOpcode.printList(ops) ).toBe(avmOut);
+  expect( AvmOptimizer.verifyLineNumbers(ops)).toBe(true);
+});

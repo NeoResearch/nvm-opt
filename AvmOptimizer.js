@@ -811,6 +811,176 @@ none=>end: NONE|approved\n";
   return fcCode;
 }
 
+// =========================================================================
+//                         Optimization
+
+// remove operation index 'i' at operation list 'oplist' (and adjust JMP/CALL)
+AvmOptimizer.removeOP = function(oplist, i)
+{
+   // remove operation i
+   oplist.splice(i, 1);
+
+   for(var j=i; j<oplist.length; j++)
+      oplist[j].byteline -= 1;
+
+   var count_jmp_fwd_adjust = 0; // forward jumps
+   var count_jmp_bwd_adjust = 0; // backward jumps
+
+   // Step 1: update forward jumps
+   var j = i - 1;
+   var count_dist = 1; // 1 byte
+   while(j > 0) {
+      if((oplist[j].opname[0] == 'J') ||(oplist[j].hexcode == "65")) { // JUMP or CALL(0x65)
+         var jmp = AvmOptimizer.byteArray2ToInt16(AvmOptimizer.littleHexStringToBigByteArray(oplist[j].args));
+         if(count_dist <= jmp) // jump (-3 bytes) after or equals to NOP position
+         {
+            //console.log("Jumping "+jmp+"positions forward at j="+j+ " (nop at i="+i+")");
+            //console.log("count_dist "+count_dist+"<= jmp="+jmp);
+            count_jmp_fwd_adjust++;
+            jmp -= 1;
+            var ba_jmp = AvmOptimizer.bigByteArray2TolittleHexString(AvmOptimizer.int16ToByteArray2(jmp));
+            //console.log("next jump value="+jmp+" ba="+ba_jmp);
+            oplist[j].args = ba_jmp;
+            oplist[j].comment = "# "+jmp;
+         }
+      }
+      count_dist += oplist[j].size; // add size of current opcode
+      j--;
+   } // end while step 1
+
+   // Step 2: update backward jumps
+   var j = i;
+   var count_dist = 1; // 1 byte
+   while(j < oplist.length) {
+      // if jump! check if nop removal the jump (must add 1).
+      if((oplist[j].opname[0] == 'J') ||(oplist[j].hexcode == "65")) { // JUMP or CALL(0x65)
+         //console.log("FOUND JUMP AT j="+j+" count_dist="+count_dist);
+         var jmp = AvmOptimizer.byteArray2ToInt16(AvmOptimizer.littleHexStringToBigByteArray(oplist[j].args));
+         //console.log("initial jump value="+jmp+" ba="+oplist[j].args);
+         if(jmp <= -count_dist) // jump (-3 bytes) before or equals to NOP position
+         {
+            // adjust jump value (+1)
+            count_jmp_bwd_adjust++;
+            jmp += 1;
+            var ba_jmp = AvmOptimizer.bigByteArray2TolittleHexString(AvmOptimizer.int16ToByteArray2(jmp));
+            //console.log("next jump value="+jmp+" ba="+ba_jmp);
+            oplist[j].args = ba_jmp;
+            oplist[j].comment = "# "+jmp;
+         }
+      }
+      count_dist += oplist[j].size; // add size of current opcode
+      j++;
+   } // finish step 2 jump search
+
+   return count_jmp_bwd_adjust + count_jmp_fwd_adjust;
+}
+
+AvmOptimizer.removeNOP = function(oplist)
+{
+   //console.log("Removing NOP from oplist(size="+oplist.length+")");
+   var countnop = 0;
+   var count_jmp_adjust = 0;
+   var i = 0;
+   while(i < oplist.length)
+   {
+      //console.log("scanning "+oplist[i].hexcode+" i="+i+"/"+oplist.length);
+      //console.log("checking opcode at i="+i+" opcode="+oplist[i].hexcode);
+      if(oplist[i].hexcode == "61")
+      {
+         console.log("found NOP at i="+i+" oplist="+oplist.length+"\n");
+         countnop++;
+         // found NOP!
+         // Step 0: remove NOP
+         count_jmp_adjust += AvmOptimizer.removeOP(oplist, i); // automatically adjust jumps
+         //console.log("adjusted "+jmps+" jumps/calls");
+      }
+      else // if NOP not found
+         i++;
+   }
+
+   console.log("removed NOPs: "+countnop+" Adjusted "+count_jmp_adjust+" jumps/calls.");
+   return countnop;
+} // removeNOP
+
+// detect the sequence: 6c FROMALTSTACK -> 76 DUP -> 6b TOALTSTACK and convert to 6a DUPFROMALTSTACK
+AvmOptimizer.detectDUPFROMALTSTACK = function(oplist)
+{
+   var count_change = 0;
+   var count_jmp_adjust = 0;
+   var i = 0;
+   while(i < oplist.length-2)
+   {
+      if((oplist[i].hexcode == "6c") && (oplist[i+1].hexcode == "76") && (oplist[i+2].hexcode == "6b"))
+      {
+         console.log("will add DUPFROMALTSTACK at i="+i+" oplist="+oplist.length+"\n");
+         count_change++;
+
+         // Step 1: remove 6c
+         count_jmp_adjust += AvmOptimizer.removeOP(oplist, i); // automatically adjust jumps
+         // Step 2: remove 76
+         count_jmp_adjust += AvmOptimizer.removeOP(oplist, i); // automatically adjust jumps
+         // Step 3: rename 6b to 6a
+         oplist[i].hexcode = "6a"; oplist[i].opname="DUPFROMALTSTACK"; oplist[i].comment = "#";
+      }
+      else // if NOP not found
+         i++;
+   }
+
+   console.log("added DUPFROMALTSTACK: "+count_change+" Adjusted "+count_jmp_adjust+" jumps/calls.");
+   return count_change;
+} // detectDUPFROMALTSTACK
+
+// inline swap: PUSH_X, PUSH_Y, SWAP => PUSH_Y,PUSH_X
+AvmOptimizer.inlineSWAP = function(oplist)
+{
+   var count_change = 0;
+   var count_jmp_adjust = 0;
+   var i = 0;
+   while(i < oplist.length-2)
+   {
+      var opvalue1 = parseInt(oplist[i].hexcode, 16);
+      var ispush1 = (opvalue1==0) || ((opvalue1>=79) && (opvalue1<=96)); // PUSH1..16
+      var opvalue2 = parseInt(oplist[i+1].hexcode, 16);
+      var ispush2 = (opvalue2==0) || ((opvalue2>=79) && (opvalue2<=96)); // PUSH1..16
+
+      if(ispush1 && ispush2 && (oplist[i+2].hexcode == "7c"))
+      {
+         console.log("will inline SWAP i="+(i+2)+" oplist="+oplist.length+"\n");
+         count_change++;
+
+         // Step 1: remove SWAP
+         count_jmp_adjust += AvmOptimizer.removeOP(oplist, i+2); // automatically adjust jumps
+         // Step 2: swap two push operations
+         var op_tmp = oplist[i];
+         oplist[i] = oplist[i+1];
+         oplist[i+1] = op_tmp;
+      }
+      else // if NOP not found
+         i++;
+   }
+
+   console.log("inlined SWAP: "+count_change+" Adjusted "+count_jmp_adjust+" jumps/calls.");
+   return count_change;
+} // inline SWAP
+
+
+AvmOptimizer.optimizeAVM = function(oplist) {
+   console.log("will remove NOPs");
+   var nop_rem = AvmOptimizer.removeNOP(oplist);
+   console.log("will detectDUPFROMALTSTACK");
+   var op_dup = AvmOptimizer.detectDUPFROMALTSTACK(oplist);
+   console.log("will inline SWAP");
+   var op_inlineswap = AvmOptimizer.inlineSWAP(oplist);
+   return nop_rem + op_dup + op_inlineswap;
+}
+
+AvmOptimizer.getAVMFromList = function(oplist) {
+   var avm = "";
+   var i = 0;
+   for(i = 0; i<oplist.length; i++)
+      avm += oplist[i].hexcode + oplist[i].args;
+   return avm;
+}
 
 //exports.AvmOptimizer = AvmOptimizer;
 module.exports = {
