@@ -644,6 +644,19 @@ AvmOptimizer.computeJumpsFrom = function(ops) {
 
 };
 
+// verify line numbers
+AvmOptimizer.verifyLineNumbers = function(ops) {
+  if(ops.length == 0)
+    return true;
+  var currentLine = 0;
+  for(var i=0; i<ops.length; i++) {
+    if(ops[i].byteline != currentLine)
+      return false;
+    currentLine += ops[i].size;
+  }
+  return true;
+}
+
 // jump list marked with: byteline, opname,  "j" (jumpsFrom), "c" (callsFrom), "r" (before is return)
 AvmOptimizer.parseJumpList = function(ops) {
   var opsJump = [];

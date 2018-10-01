@@ -731,4 +731,5 @@ test('getAVMFromList - HelloWorld: Runtime.Notify("oi")', () => {
   var ops = [];
   AvmOptimizer.parseOpcodeList(avm, ops);
   expect( NeoOpcode.printList(ops) ).toBe(avmOut);
+  expect( AvmOptimizer.verifyLineNumbers(ops)).toBe(true);
 });
