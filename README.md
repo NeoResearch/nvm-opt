@@ -8,6 +8,49 @@ reducing avm size by removing useless opcodes.
 
 Project will start with a simple algorithm for removing NOP opcodes.
 
+## How to use it
+
+### Install on web browser
+
+```html
+<script src="https://unpkg.com/neo-avm-optimizer/dist/bundle.js"></script>
+```
+
+```js
+AvmOptimizer = avmoptimizer.AvmOptimizer;
+```
+
+### Install on npm
+
+`npm install neo-avm-optimizer`
+
+```js
+const AvmOptimizer = require('neo-avm-optimizer').AvmOptimizer;
+```
+
+## For Developers
+
+### Tests
+
+`npm test`
+
+### Build Webpack
+
+`npm run build`
+
+### New minor version
+
+`npm version minor`
+
+### Push and Publish
+
+`git push origin master --tags`
+
+`npm publish`
+
+## Examples
+
+
 *How to use:*
 Execute: `nodejs`
 
