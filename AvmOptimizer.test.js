@@ -637,3 +637,30 @@ Line23->ret\n";
 
   expect( AvmOptimizer.generateFlowChartFromModules(opsModules, opsJump, ops) ).toEqual( fcCode );
 });
+
+
+test('generateFlowChartFromModules  (x<20 throw) ellipseContent=true', () => {
+  var avm = "51c56b6c766b00527ac46c766b00c30114a263050061f06c766b00c3616c7566";
+  var ops = [];
+  AvmOptimizer.parseOpcodeList(avm, ops);
+  AvmOptimizer.computeJumpsFrom(ops);
+  var opsJump = AvmOptimizer.parseJumpList(ops);
+  var opsModules = AvmOptimizer.breakAllJumpModules(opsJump);
+
+  var fcCode = "input=>start: Start Script|past\n\
+ret=>end: RET|approved\n\
+throw=>end: THROW|rejected\n\
+none=>end: NONE|approved\n\
+Line0=>operation: 0:PUSH1...17:GTE|future\n\
+Line18=>condition: 18:JMPIF|future\n\
+Line21=>operation: 21:NOP...22:THROW|future\n\
+Line23=>operation: 23:FROMALTSTACK...31:RET|future\n\
+input->Line0\n\
+Line0->Line18\n\
+Line18(no)->Line21\n\
+Line18(yes)->Line23\n\
+Line21->throw\n\
+Line23->ret\n";
+
+  expect( AvmOptimizer.generateFlowChartFromModules(opsModules, opsJump, ops, true) ).toEqual( fcCode );
+});

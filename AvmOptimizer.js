@@ -583,6 +583,7 @@ none=>end: NONE|approved\n";
   // create header
   for(var i=0; i<opsModules.length; i++)
   {
+    var lastOp = opsModules[i].length-1;
     fcCode += "Line"+(opsModules[i][0][0])+"=>";
     if((opsModules[i].length==1) && ((opsModules[i][0][1]=="JMP") || (opsModules[i][0][1]=="JMPIF") || (opsModules[i][0][1]=="JMPIFNOT") ||
          (opsModules[i][0][1]=="CALL") || (opsModules[i][0][1]=="THROWIFNOT")))
@@ -592,8 +593,14 @@ none=>end: NONE|approved\n";
     else
       fcCode += "operation: ";
     // put content in operation/condition
-    for(var j=0; j<opsModules[i].length; j++)
-      fcCode += opsModules[i][j][0]+":"+opsModules[i][j][1]+"\n";
+    if(ellipseContent) {
+      fcCode += opsModules[i][0][0]+":"+opsModules[i][0][1];
+      if(lastOp > 0)
+        fcCode += "..."+opsModules[i][lastOp][0]+":"+opsModules[i][lastOp][1];
+    }
+    else
+      for(var j=0; j<opsModules[i].length; j++)
+        fcCode += opsModules[i][j][0]+":"+opsModules[i][j][1]+"\n";
     fcCode += "|future\n";
   }
   // connections on blocks
