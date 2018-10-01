@@ -664,3 +664,57 @@ Line23->ret\n";
 
   expect( AvmOptimizer.generateFlowChartFromModules(opsModules, opsJump, ops, true) ).toEqual( fcCode );
 });
+
+
+test('generateFlowChartFromModules  (CheckWitness) ellipseContent=true', () => {
+  var avm = "00c56b611423ba2703c53263e8d6e522dc32203339dcd8eee96168184e656f2e52756e74696d652e436865636b5769746e65737364320051c576000f\
+4f574e45522069732063616c6c6572c46168124e656f2e52756e74696d652e4e6f7469667951616c756600616c7566";
+  var ops = [];
+  AvmOptimizer.parseOpcodeList(avm, ops);
+  AvmOptimizer.computeJumpsFrom(ops);
+  var opsJump = AvmOptimizer.parseJumpList(ops);
+  var opsModules = AvmOptimizer.breakAllJumpModules(opsJump);
+
+  var fcCode = "input=>start: Start Script|past\n\
+ret=>end: RET|approved\n\
+throw=>end: THROW|rejected\n\
+none=>end: NONE|approved\n\
+Line0=>operation: 0:PUSH0\n\
+1:NEWARRAY\n\
+2:TOALTSTACK\n\
+3:NOP\n\
+4:PUSHBYTES20\n\
+25:NOP\n\
+26:SYSCALL\n\
+|future\n\
+Line52=>condition: 52:JMPIFNOT\n\
+|future\n\
+Line55=>operation: 55:PUSH1\n\
+56:NEWARRAY\n\
+57:DUP\n\
+58:PUSH0\n\
+59:PUSHBYTES15\n\
+75:SETITEM\n\
+76:NOP\n\
+77:SYSCALL\n\
+97:PUSH1\n\
+98:NOP\n\
+99:FROMALTSTACK\n\
+100:DROP\n\
+101:RET\n\
+|future\n\
+Line102=>operation: 102:PUSH0\n\
+103:NOP\n\
+104:FROMALTSTACK\n\
+105:DROP\n\
+106:RET\n\
+|future\n\
+input->Line0\n\
+Line0->Line52\n\
+Line52(no)->Line55\n\
+Line52(yes)->Line102\n\
+Line55->ret\n\
+Line102->ret\n";
+
+  expect( AvmOptimizer.generateFlowChartFromModules(opsModules, opsJump, ops, false) ).toEqual( fcCode );
+});
