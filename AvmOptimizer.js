@@ -12,6 +12,8 @@
 (function(exports) {
 "use strict";
 
+// ================================================================================================
+
 // NeoOpcode supports hexcode (e.g. '00'), opname (e.g. 'ADD'), byteline (0..65k, 2 bytes),
 //    comment, args (could be any object, for example, to build "structured opcodes")
 function NeoOpcode(hexcode, opname, comment="", args="", byteline=0, objargs={}) {
@@ -45,6 +47,7 @@ NeoOpcode.printList = function(ops) {
   return str;
 }
 
+// ================================================================================================
 
 // AvmOptimizer class only groups important operations (all static)
 // immutable object
@@ -147,6 +150,8 @@ AvmOptimizer.parseOpcode = function(opcode, hexavm, oplist=[], opcounter=0) {
 				var cpush = "";
 				var sfunc = "";
 				for (i = 0; i < pvalue; i++) {
+            if(hexavm.length<2)
+              break;
 						var hexchar = "" + hexavm[0] + hexavm[1];
 						hexavm = hexavm.substr(2, hexavm.length);
 						cpush += hexchar;
@@ -165,12 +170,17 @@ AvmOptimizer.parseOpcode = function(opcode, hexavm, oplist=[], opcounter=0) {
 		//  target.val(target.val() + opcode + "\tPUSHBYTES75\t#\n");
 		else if (opcode == "4c") { // PUSHDATA1
 				var bsize = 0;
-				var sizepush = "" + hexavm[0] + hexavm[1];
-				hexavm = hexavm.substr(2, hexavm.length);
+        var sizepush = "";
+        if(hexavm.length>=2) {
+          sizepush = "" + hexavm[0] + hexavm[1];
+				  hexavm = hexavm.substr(2, hexavm.length);
+        }
 				bsize = parseInt(sizepush, 16);
 				strcomment = "#"+bsize+" bytes: ";
 				var cpush = "";
 				for (i = 0; i < bsize; i++) {
+            if(hexavm.length<2)
+              break;
 						cpush += "" + hexavm[0] + hexavm[1];
 						hexavm = hexavm.substr(2, hexavm.length);
 				}
@@ -179,15 +189,22 @@ AvmOptimizer.parseOpcode = function(opcode, hexavm, oplist=[], opcounter=0) {
 		}
 		else if (opcode == "4d") { // PUSHDATA2
 				var bsize = 0;
-				var sizepush = "" + hexavm[0] + hexavm[1];
-				hexavm = hexavm.substr(2, hexavm.length);
+        var sizepush = "";
+        if(hexavm.length>=2) {
+				   sizepush = "" + hexavm[0] + hexavm[1];
+				   hexavm = hexavm.substr(2, hexavm.length);
+        }
 				bsize = parseInt(sizepush, 16);
-				sizepush = "" + hexavm[0] + hexavm[1];
-				hexavm = hexavm.substr(2, hexavm.length);
+        if(hexavm.length>=2) {
+					 sizepush = "" + hexavm[0] + hexavm[1];
+				   hexavm = hexavm.substr(2, hexavm.length);
+        }
 				bsize += 256*parseInt(sizepush, 16);
 				strcomment = "#"+bsize+" bytes: ";
 				var cpush = "";
 				for (i = 0; i < bsize; i++) {
+            if(hexavm.length<2)
+              break;
 						cpush += "" + hexavm[0] + hexavm[1];
 						hexavm = hexavm.substr(2, hexavm.length);
 				}
@@ -196,21 +213,32 @@ AvmOptimizer.parseOpcode = function(opcode, hexavm, oplist=[], opcounter=0) {
 		}
 		else if (opcode == "4e") { // PUSHDATA4
 				var bsize = 0;
-				var sizepush = "" + hexavm[0] + hexavm[1];
-				hexavm = hexavm.substr(2, hexavm.length);
+				var sizepush = "";
+        if(hexavm.length>=2) {
+          sizepush = "" + hexavm[0] + hexavm[1];
+				  hexavm = hexavm.substr(2, hexavm.length);
+        }
 				bsize = parseInt(sizepush, 16);
-				sizepush = "" + hexavm[0] + hexavm[1];
-				hexavm = hexavm.substr(2, hexavm.length);
+        if(hexavm.length>=2) {
+          sizepush = "" + hexavm[0] + hexavm[1];
+				  hexavm = hexavm.substr(2, hexavm.length);
+        }
 				bsize += 256*parseInt(sizepush, 16);
-				sizepush = "" + hexavm[0] + hexavm[1];
-				hexavm = hexavm.substr(2, hexavm.length);
+        if(hexavm.length>=2) {
+          sizepush = "" + hexavm[0] + hexavm[1];
+				  hexavm = hexavm.substr(2, hexavm.length);
+        }
 				bsize += 256*256*parseInt(sizepush, 16);
-				sizepush = "" + hexavm[0] + hexavm[1];
-				hexavm = hexavm.substr(2, hexavm.length);
+        if(hexavm.length>=2) {
+          sizepush = "" + hexavm[0] + hexavm[1];
+				  hexavm = hexavm.substr(2, hexavm.length);
+        }
 				bsize += 256*256*256*parseInt(sizepush, 16);
 				strcomment = "#"+bsize+" bytes: ";
 				var cpush = "";
 				for (i = 0; i < bsize; i++) {
+            if(hexavm.length<2)
+              break;
 						cpush += "" + hexavm[0] + hexavm[1];
 						hexavm = hexavm.substr(2, hexavm.length);
 				}
@@ -258,29 +286,41 @@ AvmOptimizer.parseOpcode = function(opcode, hexavm, oplist=[], opcounter=0) {
 				oplist.push(new NeoOpcode(opcode, "NOP", "# Does nothing.", "", opcounter));
 		else if (opcode == "62") {
 				strcomment = "# ";
-				var nparfunc = "" + hexavm[0] + hexavm[1] + hexavm[2] + hexavm[3];
-				hexavm = hexavm.substr(4, hexavm.length);
+				var nparfunc = "";
+        if(hexavm.length>=4) {
+          nparfunc = "" + hexavm[0] + hexavm[1] + hexavm[2] + hexavm[3];
+				  hexavm = hexavm.substr(4, hexavm.length);
+        }
 				strcomment += ""+AvmOptimizer.byteArray2ToInt16(AvmOptimizer.littleHexStringToBigByteArray(nparfunc, opcounter));
 				oplist.push(new NeoOpcode(opcode, "JMP", strcomment, nparfunc, opcounter));
 		}
 		else if (opcode == "63") {
 				strcomment = "# ";
-				var nparfunc = "" + hexavm[0] + hexavm[1] + hexavm[2] + hexavm[3];
-				hexavm = hexavm.substr(4, hexavm.length);
+        var nparfunc = "";
+        if(hexavm.length>=4) {
+          nparfunc = "" + hexavm[0] + hexavm[1] + hexavm[2] + hexavm[3];
+				  hexavm = hexavm.substr(4, hexavm.length);
+        }
 				strcomment += ""+AvmOptimizer.byteArray2ToInt16(AvmOptimizer.littleHexStringToBigByteArray(nparfunc, opcounter));
 				oplist.push(new NeoOpcode(opcode, "JMPIF", strcomment, nparfunc, opcounter));
 		}
 		else if (opcode == "64") {
 				strcomment = "# ";
-				var nparfunc = "" + hexavm[0] + hexavm[1] + hexavm[2] + hexavm[3];
-				hexavm = hexavm.substr(4, hexavm.length);
+        var nparfunc = "";
+        if(hexavm.length>=4) {
+          nparfunc = "" + hexavm[0] + hexavm[1] + hexavm[2] + hexavm[3];
+				  hexavm = hexavm.substr(4, hexavm.length);
+        }
 				strcomment += ""+AvmOptimizer.byteArray2ToInt16(AvmOptimizer.littleHexStringToBigByteArray(nparfunc, opcounter));
 				oplist.push(new NeoOpcode(opcode, "JMPIFNOT", strcomment, nparfunc, opcounter));
 		}
 		else if (opcode == "65") {
 			 strcomment = "# ";
-			 var nparfunc = "" + hexavm[0] + hexavm[1] + hexavm[2] + hexavm[3];
-			 hexavm = hexavm.substr(4, hexavm.length);
+       var nparfunc = "";
+       if(hexavm.length>=4) {
+         nparfunc = "" + hexavm[0] + hexavm[1] + hexavm[2] + hexavm[3];
+         hexavm = hexavm.substr(4, hexavm.length);
+       }
 			 strcomment += ""+AvmOptimizer.byteArray2ToInt16(AvmOptimizer.littleHexStringToBigByteArray(nparfunc, opcounter));
 			 oplist.push(new NeoOpcode(opcode, "CALL", strcomment, nparfunc, opcounter));
 			 //oplist.push(new NeoOpcode(opcode, "CALL", "#", "", opcounter));
@@ -289,13 +329,19 @@ AvmOptimizer.parseOpcode = function(opcode, hexavm, oplist=[], opcounter=0) {
 				oplist.push(new NeoOpcode(opcode, "RET", "#", "", opcounter));
 		else if (opcode == "68") {
 				strcomment = "# ";
-				var nparfunc = "" + hexavm[0] + hexavm[1];
-				cpush = nparfunc;
-				hexavm = hexavm.substr(2, hexavm.length);
+				var nparfunc = "";
+        var cpush = "";
+        if(hexavm.length>=2) {
+          nparfunc = "" + hexavm[0] + hexavm[1];
+				  cpush = nparfunc;
+				  hexavm = hexavm.substr(2, hexavm.length);
+        }
 				var fvalue = parseInt(nparfunc, 16);
 				var sfunc = ""; // hexcode in string char format
 				var i = 0;
 				for (i = 0; i < fvalue; i++) {
+            if(hexavm.length<2)
+              break;
 						var hexchar = "" + hexavm[0] + hexavm[1];
 						hexavm = hexavm.substr(2, hexavm.length);
 						cpush += hexchar;
@@ -321,6 +367,8 @@ AvmOptimizer.parseOpcode = function(opcode, hexavm, oplist=[], opcounter=0) {
 						opname = "APPCALL";
 				var codecall = "";
 				for (i = 0; i < 20; i++) {
+            if(hexavm.length<2)
+              break;
 						var codepush = "" + hexavm[0] + hexavm[1];
 						hexavm = hexavm.substr(2, hexavm.length);
 						//codecall = codepush + codecall;
@@ -508,12 +556,18 @@ AvmOptimizer.parseOpcode = function(opcode, hexavm, oplist=[], opcounter=0) {
 
     else if (opcode == "e0") {
 			 strcomment = "# ";
-       var param1 = "" + hexavm[0] + hexavm[1];
-       var param2 = "" + hexavm[2] + hexavm[3];
-			 var nparfunc = "" + hexavm[4] + hexavm[5] + hexavm[6] + hexavm[7];
-			 hexavm = hexavm.substr(8, hexavm.length);
+       var param1 = "";
+       var param2 = "";
+       var nparfunc = "";
+       if(hexavm.length>=8) {
+         param1 = "" + hexavm[0] + hexavm[1];
+         param2 = "" + hexavm[2] + hexavm[3];
+			   nparfunc = "" + hexavm[4] + hexavm[5] + hexavm[6] + hexavm[7];
+			   hexavm = hexavm.substr(8, hexavm.length);
+       }
+       var params = param1+param2;
 			 strcomment += ""+params+" "+AvmOptimizer.byteArray2ToInt16(AvmOptimizer.littleHexStringToBigByteArray(nparfunc, opcounter));
-			 oplist.push(new NeoOpcode(opcode, "CALL_I", strcomment, nparfunc, opcounter));
+			 oplist.push(new NeoOpcode(opcode, "CALL_I", strcomment, params+nparfunc, opcounter));
 			 //oplist.push(new NeoOpcode(opcode, "CALL", "#", "", opcounter));
 		}
     else if ((opcode == "e1") || (opcode == "e2") || (opcode == "e3") || (opcode == "e4")) {  // read 20 bytes in reverse order
@@ -528,12 +582,19 @@ AvmOptimizer.parseOpcode = function(opcode, hexavm, oplist=[], opcounter=0) {
         if (opcode == "e4")
 						opname = "CALL_EDT";
 
-        var param1 = "" + hexavm[0] + hexavm[1];
-        var param2 = "" + hexavm[1] + hexavm[2];
-        strcomment += ""+param1 + param2;
-        hexavm = hexavm.substr(4, hexavm.length);
+        var param1 = "";
+        var param2 = "";
+
+        if(hexavm.length>=4) {
+          param1 = "" + hexavm[0] + hexavm[1];
+          param2 = "" + hexavm[1] + hexavm[2];
+          strcomment += ""+param1 + param2;
+          hexavm = hexavm.substr(4, hexavm.length);
+        }
 				var codecall = "";
 				for (i = 0; i < 20; i++) {
+            if(hexavm.length< 2)
+              break;
 						var codepush = "" + hexavm[0] + hexavm[1];
 						hexavm = hexavm.substr(2, hexavm.length);
 						//codecall = codepush + codecall;
