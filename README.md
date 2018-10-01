@@ -48,7 +48,7 @@ const AvmOptimizer = require('neo-avm-optimizer').AvmOptimizer;
 
 `npm publish`
 
-## Examples
+## Old Examples on old api (neon-opt)
 
 
 *How to use:*
