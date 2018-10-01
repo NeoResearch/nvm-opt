@@ -125,7 +125,17 @@ AvmOptimizer.getAVMFromList = function(oplist) {
 }
 
 // parse opcode 'hexavm' and inserts on oplist (also increments opcounter)
-AvmOptimizer.parseOpcodeList = function(hexavm, oplist, opcounter=0) {
+AvmOptimizer.parseOpcodeList = function(_hexavm, oplist, opcounter=0) {
+  _hexavm = _hexavm.toLowerCase();
+  var hexavm = "";
+  for(var i=0; i<_hexavm.length; i++) {
+    if(
+        ((_hexavm[i]>='0') && (_hexavm[i]<='9')) ||
+        ((_hexavm[i]>='a') && (_hexavm[i]<='f'))
+      )
+      hexavm += _hexavm[i];
+  }
+
 	if (hexavm.length == 0)
 			return; // string is empty
 	if (hexavm.length % 2 == 1)

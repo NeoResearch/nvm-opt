@@ -752,3 +752,23 @@ test('getAVMFromList - HelloWorld: Runtime.Notify("oi") - optimized', () => {
   expect( NeoOpcode.printList(ops) ).toBe(avmOut);
   expect( AvmOptimizer.verifyLineNumbers(ops)).toBe(true);
 });
+
+test('getAVMFromList - CheckWitness', () => {
+  var avm = "00c56b611423ba2703c53263e8d6e522dc32203339dcd8eee96168184e656f2e52756e74696d652e436865636b5769746e65737364320051c576000f\
+  4f574e45522069732063616c6c6572c46168124e656f2e52756e74696d652e4e6f7469667951616c756600616c7566";
+  var avmOut1 = "[(0:PUSH0:),(1:NEWARRAY:),(2:TOALTSTACK:),(3:NOP:),(4:PUSHBYTES20:23ba2703c53263e8d6e522dc32203339dcd8eee9),(25:NOP:),\
+(26:SYSCALL:184e656f2e52756e74696d652e436865636b5769746e657373),(52:JMPIFNOT:3200),(55:PUSH1:),(56:NEWARRAY:),(57:DUP:),(58:PUSH0:),\
+(59:PUSHBYTES15:4f574e45522069732063616c6c6572),(75:SETITEM:),(76:NOP:),(77:SYSCALL:124e656f2e52756e74696d652e4e6f74696679),(97:PUSH1:),(98:NOP:),\
+(99:FROMALTSTACK:),(100:DROP:),(101:RET:),(102:PUSH0:),(103:NOP:),(104:FROMALTSTACK:),(105:DROP:),(106:RET:)]";
+  var avmOut = "[(0:PUSH0:),(1:NEWARRAY:),(2:TOALTSTACK:),(3:PUSHBYTES20:23ba2703c53263e8d6e522dc32203339dcd8eee9),\
+(24:SYSCALL:184e656f2e52756e74696d652e436865636b5769746e657373),(50:JMPIFNOT:2f00),(53:PUSH1:),(54:NEWARRAY:),(55:DUP:),(56:PUSH0:),\
+(57:PUSHBYTES15:4f574e45522069732063616c6c6572),(73:SETITEM:),(74:SYSCALL:124e656f2e52756e74696d652e4e6f74696679),(94:PUSH1:),\
+(95:FROMALTSTACK:),(96:DROP:),(97:RET:),(98:PUSH0:),(99:FROMALTSTACK:),(100:DROP:),(101:RET:)]";
+
+  var ops = [];
+  AvmOptimizer.parseOpcodeList(avm, ops);
+  expect( NeoOpcode.printList(ops) ).toBe(avmOut1);
+  AvmOptimizer.optimizeAVM(ops);
+  expect( NeoOpcode.printList(ops) ).toBe(avmOut);
+  expect( AvmOptimizer.verifyLineNumbers(ops)).toBe(true);
+});
