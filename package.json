@@ -1,6 +1,6 @@
 {
   "name": "neo-avm-optimizer",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Neo AVM optimizer",
   "main": "index.js",
   "scripts": {
