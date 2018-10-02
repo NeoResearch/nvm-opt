@@ -744,7 +744,21 @@ AvmOptimizer.findLineOnOplist = function(line, opsJumps) {
   return -1;
 }
 
+// looks for unreachable code in list (true if exists; false, otherwise)
+AvmOptimizer.findUnreachableCode = function(opsJumps) {
+  for(var i=0; i<opsJumps.length-1; i++)
+    if(
+        ((opsJumps[i][1]=="RET")||(opsJumps[i][1]=="THROW")) &&
+        ((opsJumps[i+1][2]==0) && (opsJumps[i+1][3]==0))
+      ) {
+        return i+1;
+      }
+  return -1;
+}
+
+// =========================================================================
 // generate a flowchart.js based on modular list 'opsModules', merged list 'opsJumps' and raw operation list 'ops'
+// =========================================================================
 AvmOptimizer.generateFlowChartFromModules = function(opsModules, opsJumps, ops, ellipseContent=false) {
   var fcCode = "";
   fcCode += "input=>start: Start Script|past\n\
@@ -823,6 +837,7 @@ none=>end: NONE|approved\n";
 
 // =========================================================================
 //                         Optimization
+// =========================================================================
 
 // remove operation index 'i' at operation list 'oplist' (and adjust JMP/CALL)
 AvmOptimizer.removeOP = function(oplist, i)

@@ -776,4 +776,25 @@ test('getAVMFromList - CheckWitness', () => {
   expect( AvmOptimizer.verifyLineNumbers(ops)).toBe(true);
   expect( AvmOptimizer.getAVMFromList(ops) ).toBe(avmOpt);
 
+  // ---------
+
+  AvmOptimizer.parseOpcodeList(avmOpt, ops);
+  AvmOptimizer.computeJumpsFrom(ops);
+  var opsJump = AvmOptimizer.parseJumpList(ops);
+  var opsModules = AvmOptimizer.breakJumpModules(opsJump);
+  var opsCompare0 = [[0, "PUSH0", [], []], [1, "NEWARRAY", [], []], [2, "TOALTSTACK", [], []], [3, "PUSHBYTES20", [], []], [24, "SYSCALL", [], []],
+[50, "JMPIFNOT", [], []], [53, "PUSH1", [], []], [54, "NEWARRAY", [], []], [55, "DUP", [], []], [56, "PUSH0", [], []], [57, "PUSHBYTES15", [], []],
+[73, "SETITEM", [], []], [74, "SYSCALL", [], []], [94, "PUSH1", [], []], [95, "FROMALTSTACK", [], []], [96, "DROP", [], []]];
+  var opsCompare1 = [[97, "RET", [50, 50], []], [98, "PUSH0", [], []], [99, "FROMALTSTACK", [], []], [100, "DROP", [], []], [101, "RET", [], []],
+[0, "PUSH0", [], []], [1, "NEWARRAY", [], []], [2, "TOALTSTACK", [], []], [3, "PUSHBYTES20", [], []], [24, "SYSCALL", [], []], [50, "JMPIFNOT", [], []],
+[53, "PUSH1", [], []], [54, "NEWARRAY", [], []], [55, "DUP", [], []], [56, "PUSH0", [], []], [57, "PUSHBYTES15", [], []], [73, "SETITEM", [], []],
+[74, "SYSCALL", [], []], [94, "PUSH1", [], []], [95, "FROMALTSTACK", [], []], [96, "DROP", [], []]];
+  var opsCompare2 =  [[97, "RET", [50, 50], []], [98, "PUSH0", [], []], [99, "FROMALTSTACK", [], []], [100, "DROP", [], []], [101, "RET", [], []]];
+
+  expect( opsModules.length ).toEqual( 3 );
+  expect( opsModules[0] ).toEqual( opsCompare0 );
+  expect( opsModules[1] ).toEqual( opsCompare1 );
+  expect( opsModules[2] ).toEqual( opsCompare2 );
+  expect( AvmOptimizer.findUnreachableCode(opsJump)).toBe(-1);
+
 });
