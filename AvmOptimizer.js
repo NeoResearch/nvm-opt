@@ -842,6 +842,9 @@ none=>end: NONE|approved\n";
 // remove operation index 'i' at operation list 'oplist' (and adjust JMP/CALL)
 AvmOptimizer.removeOP = function(oplist, i)
 {
+   //console.log("removeOP("+i+")");
+   //console.log("oplist: "+oplist);
+
    // remove operation i
    oplist.splice(i, 1);
 
@@ -857,9 +860,9 @@ AvmOptimizer.removeOP = function(oplist, i)
    while(j > 0) {
       if((oplist[j].opname[0] == 'J') ||(oplist[j].hexcode == "65")) { // JUMP or CALL(0x65)
          var jmp = AvmOptimizer.byteArray2ToInt16(AvmOptimizer.littleHexStringToBigByteArray(oplist[j].args));
-         if(count_dist <= jmp) // jump (-3 bytes) after or equals to NOP position
+         if(count_dist <= jmp-2) // jump (-3 bytes) after or equals to NOP position
          {
-            //console.log("Jumping "+jmp+"positions forward at j="+j+ " (nop at i="+i+")");
+            //console.log("Forward: Jumping "+jmp+" positions forward at j="+j+" (nop at i="+i+") count_dist:"+count_dist);
             //console.log("count_dist "+count_dist+"<= jmp="+jmp);
             count_jmp_fwd_adjust++;
             jmp -= 1;
@@ -870,6 +873,7 @@ AvmOptimizer.removeOP = function(oplist, i)
          }
       }
       count_dist += oplist[j].size; // add size of current opcode
+      //console.log("sum="+count_dist+" op:"+oplist[j].opname);
       j--;
    } // end while step 1
 
@@ -884,6 +888,7 @@ AvmOptimizer.removeOP = function(oplist, i)
          //console.log("initial jump value="+jmp+" ba="+oplist[j].args);
          if(jmp <= -count_dist) // jump (-3 bytes) before or equals to NOP position
          {
+           //console.log("Backwards: Jumping "+jmp+"positions forward at j="+j+ " (nop at i="+i+")");
             // adjust jump value (+1)
             count_jmp_bwd_adjust++;
             jmp += 1;
@@ -912,7 +917,7 @@ AvmOptimizer.removeNOP = function(oplist)
       //console.log("checking opcode at i="+i+" opcode="+oplist[i].hexcode);
       if(oplist[i].hexcode == "61")
       {
-         console.log("found NOP at i="+i+" oplist="+oplist.length+"\n");
+         //console.log("found NOP at i="+i+"/"+oplist.length+"\n");
          countnop++;
          // found NOP!
          // Step 0: remove NOP
@@ -923,7 +928,7 @@ AvmOptimizer.removeNOP = function(oplist)
          i++;
    }
 
-   console.log("removed NOPs: "+countnop+" Adjusted "+count_jmp_adjust+" jumps/calls.");
+   //console.log("removed NOPs: "+countnop+" Adjusted "+count_jmp_adjust+" jumps/calls.");
    return countnop;
 } // removeNOP
 
@@ -991,11 +996,14 @@ AvmOptimizer.inlineSWAP = function(oplist)
 
 AvmOptimizer.optimizeAVM = function(oplist) {
    console.log("will remove NOPs");
-   var nop_rem = AvmOptimizer.removeNOP(oplist);
-   console.log("will detectDUPFROMALTSTACK");
-   var op_dup = AvmOptimizer.detectDUPFROMALTSTACK(oplist);
-   console.log("will inline SWAP");
-   var op_inlineswap = AvmOptimizer.inlineSWAP(oplist);
+   var nop_rem = 0;
+   var op_dup = 0;
+   var op_inlineswap = 0;
+   nop_rem += AvmOptimizer.removeNOP(oplist);
+   //console.log("will detectDUPFROMALTSTACK");
+   op_dup += AvmOptimizer.detectDUPFROMALTSTACK(oplist);
+   //console.log("will inline SWAP");
+   op_inlineswap += AvmOptimizer.inlineSWAP(oplist);
    return nop_rem + op_dup + op_inlineswap;
 }
 

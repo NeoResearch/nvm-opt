@@ -761,11 +761,12 @@ test('getAVMFromList - CheckWitness', () => {
 (59:PUSHBYTES15:4f574e45522069732063616c6c6572),(75:SETITEM:),(76:NOP:),(77:SYSCALL:124e656f2e52756e74696d652e4e6f74696679),(97:PUSH1:),(98:NOP:),\
 (99:FROMALTSTACK:),(100:DROP:),(101:RET:),(102:PUSH0:),(103:NOP:),(104:FROMALTSTACK:),(105:DROP:),(106:RET:)]";
   var avmOutList = "[(0:PUSH0:),(1:NEWARRAY:),(2:TOALTSTACK:),(3:PUSHBYTES20:23ba2703c53263e8d6e522dc32203339dcd8eee9),\
-(24:SYSCALL:184e656f2e52756e74696d652e436865636b5769746e657373),(50:JMPIFNOT:2f00),(53:PUSH1:),(54:NEWARRAY:),(55:DUP:),(56:PUSH0:),\
-(57:PUSHBYTES15:4f574e45522069732063616c6c6572),(73:SETITEM:),(74:SYSCALL:124e656f2e52756e74696d652e4e6f74696679),(94:PUSH1:),\
-(95:FROMALTSTACK:),(96:DROP:),(97:RET:),(98:PUSH0:),(99:FROMALTSTACK:),(100:DROP:),(101:RET:)]";
-  var avmOpt = "00c56b1423ba2703c53263e8d6e522dc32203339dcd8eee968184e656f2e52756e74696d652e436865636b5769746e657373642f0051c576000f4f\
-574e45522069732063616c6c6572c468124e656f2e52756e74696d652e4e6f74696679516c7566006c7566";
+(24:SYSCALL:184e656f2e52756e74696d652e436865636b5769746e657373),(50:JMPIFNOT:3000),(53:PUSH1:),(54:NEWARRAY:),(55:DUP:),(56:PUSH0:),\
+(57:PUSHBYTES15:4f574e45522069732063616c6c6572),(73:SETITEM:),(74:SYSCALL:124e656f2e52756e74696d652e4e6f74696679),(94:PUSH1:),(95:FROMALTSTACK:),\
+(96:DROP:),(97:RET:),(98:PUSH0:),(99:FROMALTSTACK:),(100:DROP:),(101:RET:)]";
+  var avmOpt = "00c56b1423ba2703c53263e8d6e522dc32203339dcd8eee968184e656f2e52756e74696d652e436865636b5769746e65737364300051c576000f4f574e455220697\
+32063616c6c6572c468124e656f2e52756e74696d652e4e6f74696679516c7566006c7566"
+
   // THIS OPTIMIZATION SEEMS PROBLEMATIC!! JUST LOOK AT FLUXOGRAM!
 
   var ops = [];
@@ -781,20 +782,22 @@ test('getAVMFromList - CheckWitness', () => {
   AvmOptimizer.parseOpcodeList(avmOpt, ops);
   AvmOptimizer.computeJumpsFrom(ops);
   var opsJump = AvmOptimizer.parseJumpList(ops);
+
   var opsModules = AvmOptimizer.breakJumpModules(opsJump);
   var opsCompare0 = [[0, "PUSH0", [], []], [1, "NEWARRAY", [], []], [2, "TOALTSTACK", [], []], [3, "PUSHBYTES20", [], []], [24, "SYSCALL", [], []],
 [50, "JMPIFNOT", [], []], [53, "PUSH1", [], []], [54, "NEWARRAY", [], []], [55, "DUP", [], []], [56, "PUSH0", [], []], [57, "PUSHBYTES15", [], []],
-[73, "SETITEM", [], []], [74, "SYSCALL", [], []], [94, "PUSH1", [], []], [95, "FROMALTSTACK", [], []], [96, "DROP", [], []]];
-  var opsCompare1 = [[97, "RET", [50, 50], []], [98, "PUSH0", [], []], [99, "FROMALTSTACK", [], []], [100, "DROP", [], []], [101, "RET", [], []],
-[0, "PUSH0", [], []], [1, "NEWARRAY", [], []], [2, "TOALTSTACK", [], []], [3, "PUSHBYTES20", [], []], [24, "SYSCALL", [], []], [50, "JMPIFNOT", [], []],
-[53, "PUSH1", [], []], [54, "NEWARRAY", [], []], [55, "DUP", [], []], [56, "PUSH0", [], []], [57, "PUSHBYTES15", [], []], [73, "SETITEM", [], []],
-[74, "SYSCALL", [], []], [94, "PUSH1", [], []], [95, "FROMALTSTACK", [], []], [96, "DROP", [], []]];
-  var opsCompare2 =  [[97, "RET", [50, 50], []], [98, "PUSH0", [], []], [99, "FROMALTSTACK", [], []], [100, "DROP", [], []], [101, "RET", [], []]];
+[73, "SETITEM", [], []], [74, "SYSCALL", [], []], [94, "PUSH1", [], []], [95, "FROMALTSTACK", [], []], [96, "DROP", [], []], [97, "RET", [], []]];
+  var opsCompare1 = [[98, "PUSH0", [50, 50], []], [99, "FROMALTSTACK", [], []], [100, "DROP", [], []], [101, "RET", [], []], [0, "PUSH0", [], []],
+[1, "NEWARRAY", [], []], [2, "TOALTSTACK", [], []], [3, "PUSHBYTES20", [], []], [24, "SYSCALL", [], []], [50, "JMPIFNOT", [], []], [53, "PUSH1", [], []],
+[54, "NEWARRAY", [], []], [55, "DUP", [], []], [56, "PUSH0", [], []], [57, "PUSHBYTES15", [], []], [73, "SETITEM", [], []], [74, "SYSCALL", [], []],
+[94, "PUSH1", [], []], [95, "FROMALTSTACK", [], []], [96, "DROP", [], []], [97, "RET", [], []]];
+  var opsCompare2 =  [[98, "PUSH0", [50, 50], []], [99, "FROMALTSTACK", [], []], [100, "DROP", [], []], [101, "RET", [], []]];
 
   expect( opsModules.length ).toEqual( 3 );
   expect( opsModules[0] ).toEqual( opsCompare0 );
   expect( opsModules[1] ).toEqual( opsCompare1 );
   expect( opsModules[2] ).toEqual( opsCompare2 );
+
   expect( AvmOptimizer.findUnreachableCode(opsJump)).toBe(-1);
 
 });
