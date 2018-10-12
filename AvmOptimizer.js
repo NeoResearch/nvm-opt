@@ -749,8 +749,9 @@ AvmOptimizer.findUnreachableCode = function(opsJumps) {
   for(var i=0; i<opsJumps.length-1; i++)
     if(
         ((opsJumps[i][1]=="RET")||(opsJumps[i][1]=="THROW")) &&
-        ((opsJumps[i+1][2]==0) && (opsJumps[i+1][3]==0))
+        ((opsJumps[i+1][2].length==0) && (opsJumps[i+1][3].length==0))
       ) {
+        console.log("unreachable:"+opsJumps[i]);
         return i+1;
       }
   return -1;
