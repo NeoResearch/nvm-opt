@@ -213,6 +213,24 @@ can become:
 The same may apply to PUSH1/ROLL -> SWAP.
 
 
+-------------------
+
+Another idea:
+
+```
+51 PUSH1  
+c5 NEWARRAY   (create array)
+6b TOALTSTACK  (move it to altstack)
+6a DUPFROMALTSTACK  (clone it to main stack)
+00 PUSH0  (prepare to set 0)
+52 PUSH2  (take element previous to array)
+7a ROLL  (roll two)
+c4 SETITEM  (set element before array to position 0)
+```
+Can become: PUSH1 -> PACK -> TOALTSTACK (standard can evolve to more elements in array)
+
+------------------
+
 _NeoResearch team_
 
 _Copyleft 2018 - MIT License_
