@@ -229,7 +229,29 @@ c4 SETITEM  (set element before array to position 0)
 ```
 Can become: PUSH1 -> PACK -> TOALTSTACK (standard can evolve to more elements in array)
 
+-----------------
+
+```
+6b TOALTSTACK  #
+6a DUPFROMALTSTACK  #
+```
+
+can become: DUP -> TOALTSTACK
+
 ------------------
+
+Finally,
+
+```
+XXX
+TOALTSTACK
+# main stack only code
+FROMALTSTACK
+DROP
+```
+May eliminate item `XXX`.
+
+-----------------
 
 _NeoResearch team_
 
