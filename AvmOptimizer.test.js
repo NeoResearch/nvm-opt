@@ -820,7 +820,15 @@ test('breakJumpModules (x<10 then true)', () => {
 
 test('AvmOptimizer.detect_PUSH1_PACK_TOALTSTACK("51c56b6a00527ac4")) equals "51c16b"', () => {
   var ops = [];
-  AvmOptimizer.parseOpcodeList("51c56b6a00527ac4", ops);  
+  AvmOptimizer.parseOpcodeList("51c56b6a00527ac4", ops);
   AvmOptimizer.optimizeAVM(ops);
   expect( AvmOptimizer.getAVMFromList(ops)).toBe("51c16b");
+});
+
+// pubkey 030000000000000000000000000000000000000000000000000000000000000000
+test('OptimizeAVM("51c56b6c766b00527ac46a00c36121030000000000000000000000000000000000000000000000000000000000000000ac616c7566")) equals "51c16b"', () => {
+  var ops = [];
+  AvmOptimizer.parseOpcodeList("51c56b6c766b00527ac46a00c36121030000000000000000000000000000000000000000000000000000000000000000ac616c7566", ops);
+  AvmOptimizer.optimizeAVM(ops);
+  expect( AvmOptimizer.getAVMFromList(ops)).toBe("51c16b6a00c321030000000000000000000000000000000000000000000000000000000000000000ac6c7566");
 });
