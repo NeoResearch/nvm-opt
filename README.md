@@ -249,7 +249,7 @@ TOALTSTACK
 FROMALTSTACK
 DROP
 ```
-May eliminate item `XXX`.
+May eliminate opcodes `TOALTSTACK` and `FROMALTSTACK/DROP`.
 
 -----------------
 
