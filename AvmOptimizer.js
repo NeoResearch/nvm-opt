@@ -961,6 +961,52 @@ AvmOptimizer.detectDUPFROMALTSTACK = function(oplist)
    return count_change;
 } // detectDUPFROMALTSTACK
 
+// detect the sequence: PUSH1 PACK TOALTSTACK
+AvmOptimizer.detect_PUSH1_PACK_TOALTSTACK = function(oplist)
+{
+   var count_change = 0;
+   var count_jmp_adjust = 0;
+   var i = 0;
+   //console.log(oplist);
+   while(i < oplist.length-7) // requires 8 opcodes at least
+   {
+       //51 PUSH1
+       //c5 NEWARRAY   (create array)
+       //6b TOALTSTACK  (move it to altstack)
+       //6a DUPFROMALTSTACK  (clone it to main stack)
+       //00 PUSH0  (prepare to set 0)
+       //52 PUSH2  (take element previous to array)
+       //7a ROLL  (roll two)
+       //c4 SETITEM  (set element before array to position 0)
+
+      if( (oplist[i].hexcode == "51") &&
+          (oplist[i+1].hexcode == "c5") &&
+          (oplist[i+2].hexcode == "6b") &&
+          (oplist[i+3].hexcode == "6a") &&
+          (oplist[i+4].hexcode == "00") &&
+          (oplist[i+5].hexcode == "52") &&
+          (oplist[i+6].hexcode == "7a") &&
+          (oplist[i+7].hexcode == "c4")
+        )
+      {
+         console.log("found pattern PUSH1 PACK TOALTSTACK at i="+i+" oplist="+oplist.length+"\n");
+         count_change++;
+
+         // Step 1: remove 5 ops (at i+1), to keep PUSH1
+         for(var j=0; j<5; j++)
+            count_jmp_adjust += AvmOptimizer.removeOP(oplist, i+1); // automatically adjust jumps
+         // Step 2: update opcodes (i+1) and (i+2)
+         oplist[i+1].hexcode = "c1"; oplist[i+1].opname="PACK"; oplist[i+1].comment = "#";
+         oplist[i+2].hexcode = "6b"; oplist[i+2].opname="TOALTSTACK"; oplist[i+2].comment = "#";
+      }
+      else // if pattern not found
+         i++;
+   }
+
+   console.log("patterns found: "+count_change+" Adjusted "+count_jmp_adjust+" jumps/calls.");
+   return count_change;
+} // detect_PUSH1_PACK_TOALTSTACK
+
 // inline swap: PUSH_X, PUSH_Y, SWAP => PUSH_Y,PUSH_X
 AvmOptimizer.inlineSWAP = function(oplist)
 {
@@ -996,16 +1042,15 @@ AvmOptimizer.inlineSWAP = function(oplist)
 
 
 AvmOptimizer.optimizeAVM = function(oplist) {
-   console.log("will remove NOPs");
-   var nop_rem = 0;
-   var op_dup = 0;
-   var op_inlineswap = 0;
-   nop_rem += AvmOptimizer.removeNOP(oplist);
+   console.log("starting optimizer");
+   var nop_rem = AvmOptimizer.removeNOP(oplist);
    //console.log("will detectDUPFROMALTSTACK");
-   op_dup += AvmOptimizer.detectDUPFROMALTSTACK(oplist);
+   var op_dup = AvmOptimizer.detectDUPFROMALTSTACK(oplist);
    //console.log("will inline SWAP");
-   op_inlineswap += AvmOptimizer.inlineSWAP(oplist);
-   return nop_rem + op_dup + op_inlineswap;
+   var op_inlineswap = AvmOptimizer.inlineSWAP(oplist);
+   var op_pattern1 = AvmOptimizer.detect_PUSH1_PACK_TOALTSTACK(oplist);
+
+   return nop_rem + op_dup + op_inlineswap + op_pattern1;
 }
 
 AvmOptimizer.getAVMFromList = function(oplist) {
