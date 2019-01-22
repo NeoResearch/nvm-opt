@@ -244,12 +244,13 @@ Finally,
 
 ```
 XXX
+DUP
 TOALTSTACK
 # main stack only code
 FROMALTSTACK
 DROP
 ```
-May eliminate opcodes `TOALTSTACK` and `FROMALTSTACK/DROP`.
+May eliminate opcodes `DUP/TOALTSTACK` and `FROMALTSTACK/DROP`.
 
 -----------------
 
