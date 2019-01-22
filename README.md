@@ -253,6 +253,14 @@ DROP
 May eliminate opcodes `DUP/TOALTSTACK` and `FROMALTSTACK/DROP`.
 
 -----------------
+Useless pack/pick:
+```
+PUSH1
+PACK
+PUSH0
+PICKITEM
+```
+-----------------
 
 _NeoResearch team_
 
