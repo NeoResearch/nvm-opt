@@ -1007,6 +1007,37 @@ AvmOptimizer.detect_PUSH1_PACK_TOALTSTACK = function(oplist)
    return count_change;
 } // detect_PUSH1_PACK_TOALTSTACK
 
+// detect the sequence: TOALTSTACK DUPFROMALTSTACK => DUP TOALTSTACK
+AvmOptimizer.detect_TOALTSTACK_DUPFROMALTSTACK = function(oplist)
+{
+   var count_change = 0;
+   var count_jmp_adjust = 0;
+   var i = 0;
+   //console.log(oplist);
+   while(i < oplist.length-1) // requires 2 opcodes at least
+   {
+       //6b TOALTSTACK  (move it to altstack)
+       //6a DUPFROMALTSTACK  (clone it to main stack)
+
+      if( (oplist[i].hexcode == "6b") &&
+          (oplist[i+1].hexcode == "6a")
+        )
+      {
+         console.log("found pattern TOALTSTACK_DUPFROMALTSTACK at i="+i+" oplist="+oplist.length+"\n");
+         count_change++;
+
+         // Step 1: update opcodes (i+0) and (i+1)
+         oplist[i].hexcode = "76"; oplist[i].opname="DUP"; oplist[i].comment = "#";
+         oplist[i+1].hexcode = "6b"; oplist[i+1].opname="TOALTSTACK"; oplist[i+1].comment = "#";
+      }
+      else // if pattern not found
+         i++;
+   }
+
+   console.log("patterns found: "+count_change+" Adjusted "+count_jmp_adjust+" jumps/calls.");
+   return count_change;
+} // detect_TOALTSTACK_DUPFROMALTSTACK
+
 // inline swap: PUSH_X, PUSH_Y, SWAP => PUSH_Y,PUSH_X
 AvmOptimizer.inlineSWAP = function(oplist)
 {
@@ -1049,8 +1080,9 @@ AvmOptimizer.optimizeAVM = function(oplist) {
    //console.log("will inline SWAP");
    var op_inlineswap = AvmOptimizer.inlineSWAP(oplist);
    var op_pattern1 = AvmOptimizer.detect_PUSH1_PACK_TOALTSTACK(oplist);
+   var op_pattern2 = AvmOptimizer.detect_TOALTSTACK_DUPFROMALTSTACK(oplist);
 
-   return nop_rem + op_dup + op_inlineswap + op_pattern1;
+   return nop_rem + op_dup + op_inlineswap + op_pattern1 + op_pattern2;
 }
 
 AvmOptimizer.getAVMFromList = function(oplist) {

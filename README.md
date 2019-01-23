@@ -236,7 +236,7 @@ Can become: PUSH1 -> PACK -> TOALTSTACK (standard can evolve to more elements in
 6a DUPFROMALTSTACK  #
 ```
 
-can become: DUP -> TOALTSTACK
+can become: (76) DUP -> (6b) TOALTSTACK
 
 ------------------
 
