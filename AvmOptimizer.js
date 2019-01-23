@@ -991,6 +991,25 @@ AvmOptimizer.detect_51c100c3 = function(oplist)
    return count_change;
 } // detect pattern 51c100c3
 
+// remove last RET
+AvmOptimizer.removeLastRET = function(oplist)
+{
+   var count_change = 0;
+   var count_jmp_adjust = 0;
+   if(oplist[oplist.length-1].hexcode == "66")
+   {
+      console.log("removeLastRET oplist="+oplist.length+"\n");
+      count_change++;
+
+      // Step 1: remove last RET
+      count_jmp_adjust += AvmOptimizer.removeOP(oplist, oplist.length-1); // automatically adjust jumps
+   }
+
+   console.log("removeLastRET: "+count_change+" Adjusted "+count_jmp_adjust+" jumps/calls.");
+   return count_change;
+} // removeLastRET
+
+
 // detect the sequence: PUSH1 PACK TOALTSTACK
 AvmOptimizer.detect_PUSH1_PACK_TOALTSTACK = function(oplist)
 {
@@ -1173,7 +1192,7 @@ AvmOptimizer.inlineSWAP = function(oplist)
 } // inline SWAP
 
 
-AvmOptimizer.optimizeAVM = function(oplist) {
+AvmOptimizer.optimizeAVM = function(oplist, heavyopt=false) {
    console.log("starting optimizer");
    var nop_rem = AvmOptimizer.removeNOP(oplist);
    //console.log("will detectDUPFROMALTSTACK");
@@ -1184,8 +1203,11 @@ AvmOptimizer.optimizeAVM = function(oplist) {
    var op_pattern2 = AvmOptimizer.detect_TOALTSTACK_DUPFROMALTSTACK(oplist);
    var op_pattern3 = AvmOptimizer.detect_DUP_TOALT_FROM_ALT_DROP(oplist);
    var op_pattern4 = AvmOptimizer.detect_51c100c3(oplist);
+   var op_pattern5 = 0;
+   if(heavyopt) // only in extreme cases
+      AvmOptimizer.removeLastRET(oplist);
 
-   return nop_rem + op_dup + op_inlineswap + op_pattern1 + op_pattern2 + op_pattern3 + op_pattern4;
+   return nop_rem + op_dup + op_inlineswap + op_pattern1 + op_pattern2 + op_pattern3 + op_pattern4 + op_pattern5;
 }
 
 AvmOptimizer.getAVMFromList = function(oplist) {

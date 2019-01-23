@@ -262,6 +262,10 @@ PICKITEM
 ```
 -----------------
 
+Remove last RET (last line only)
+
+-----------------
+
 _NeoResearch team_
 
 _Copyleft 2018 - MIT License_

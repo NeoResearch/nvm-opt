@@ -826,11 +826,11 @@ test('AvmOptimizer.detect_PUSH1_PACK_TOALTSTACK("51c56b6a00527ac4")) equals "51c
 });
 
 // pubkey 030000000000000000000000000000000000000000000000000000000000000000
-test('pattern1-OptimizeAVM("51c56b6c766b00527ac46a00c36121030000000000000000000000000000000000000000000000000000000000000000ac616c7566")) equals "21030000000000000000000000000000000000000000000000000000000000000000ac66"', () => {
+test('pattern1-OptimizeAVM("51c56b6c766b00527ac46a00c36121030000000000000000000000000000000000000000000000000000000000000000ac616c7566")) equals "21030000000000000000000000000000000000000000000000000000000000000000ac"', () => {
   var ops = [];
   AvmOptimizer.parseOpcodeList("51c56b6c766b00527ac46a00c36121030000000000000000000000000000000000000000000000000000000000000000ac616c7566", ops);
-  AvmOptimizer.optimizeAVM(ops);
-  expect( AvmOptimizer.getAVMFromList(ops)).toBe("21030000000000000000000000000000000000000000000000000000000000000000ac66");
+  AvmOptimizer.optimizeAVM(ops, true);
+  expect( AvmOptimizer.getAVMFromList(ops)).toBe("21030000000000000000000000000000000000000000000000000000000000000000ac");
 });
 
 test('6a6b-pattern-OptimizeAVM("6b6a")) equals "766b"', () => {
@@ -840,9 +840,9 @@ test('6a6b-pattern-OptimizeAVM("6b6a")) equals "766b"', () => {
   expect( AvmOptimizer.getAVMFromList(ops)).toBe("766b");
 });
 
-test('51c100c3-pattern-OptimizeAVM("51c100c366")) equals "66"', () => {
+test('51c100c3-pattern-OptimizeAVM("51c100c366")) equals ""', () => {
   var ops = [];
   AvmOptimizer.parseOpcodeList("51c100c366", ops);
-  AvmOptimizer.optimizeAVM(ops);
-  expect( AvmOptimizer.getAVMFromList(ops)).toBe("66");
+  AvmOptimizer.optimizeAVM(ops, true);
+  expect( AvmOptimizer.getAVMFromList(ops)).toBe("");
 });
