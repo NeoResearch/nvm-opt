@@ -244,11 +244,11 @@ Finally,
 
 ```
 XXX
-DUP
-TOALTSTACK
+76 DUP
+6b TOALTSTACK
 # main stack only code
-FROMALTSTACK
-DROP
+6c FROMALTSTACK
+75 DROP
 ```
 May eliminate opcodes `DUP/TOALTSTACK` and `FROMALTSTACK/DROP`.
 

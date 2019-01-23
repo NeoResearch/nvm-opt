@@ -1038,6 +1038,77 @@ AvmOptimizer.detect_TOALTSTACK_DUPFROMALTSTACK = function(oplist)
    return count_change;
 } // detect_TOALTSTACK_DUPFROMALTSTACK
 
+
+// detect the sequence: DUP/TOALTSTACK (mainstack) FROMALTSTACK/DROP.
+AvmOptimizer.detect_DUP_TOALT_FROM_ALT_DROP = function(oplist)
+{
+   var count_change = 0;
+   var count_jmp_adjust = 0;
+   var i = 0;
+   //console.log(oplist);
+   var found = -1;
+   while(i < oplist.length-3) // requires 4 opcodes at least
+   {
+       //76 DUP
+       //6b TOALTSTACK
+      found = -1;
+      if( (oplist[i].hexcode == "76") &&
+          (oplist[i+1].hexcode == "6b")
+        )
+      {
+         for(var j=i+2; j<oplist.length; j++)
+         {
+            if( (oplist[j].hexcode == "6c") &&
+               (oplist[j+1].hexcode == "75")
+              )
+            {
+              found = j;
+              break;
+            }
+            if(j - i > 5) // max limit of opcodes to explore
+              break;
+         }
+
+         // verify if some not basic main stack operation is performed
+         // for now allowing: 00 PUSH0, c3 pickitem, 21 pushbytes33, ac checksig
+         if(found > 0)
+         {
+            for(var j=i+2; j<found; j++)
+              if( !( (oplist[j].hexcode == "00") ||
+                      (oplist[j].hexcode == "c3") ||
+                      (oplist[j].hexcode == "21") ||
+                      (oplist[j].hexcode == "ac")
+                   )
+                )
+                {
+                    // operation not allowed (should only consider main stack "simple" ops)
+                    found = -1;
+                    break;
+                }
+         }
+       }
+
+       // really found optimization!
+       if(found > 0)
+       {
+         console.log("found pattern DUP_ALTSTACK_DROP at i="+i+" oplist="+oplist.length+"\n");
+         count_change++;
+
+         // Step 1: remove DUP and TOALTSTACK
+         count_jmp_adjust += AvmOptimizer.removeOP(oplist, i); // automatically adjust jumps
+         count_jmp_adjust += AvmOptimizer.removeOP(oplist, i); // automatically adjust jumps
+         // Step 2: remove FROMALTSTACK and DROP
+         count_jmp_adjust += AvmOptimizer.removeOP(oplist, found-2); // automatically adjust jumps
+         count_jmp_adjust += AvmOptimizer.removeOP(oplist, found-2); // automatically adjust jumps
+       }
+       else // if pattern not found
+         i++;
+   }
+
+   console.log("patterns found: "+count_change+" Adjusted "+count_jmp_adjust+" jumps/calls.");
+   return count_change;
+} // detect_TOALTSTACK_DUPFROMALTSTACK
+
 // inline swap: PUSH_X, PUSH_Y, SWAP => PUSH_Y,PUSH_X
 AvmOptimizer.inlineSWAP = function(oplist)
 {
@@ -1081,8 +1152,9 @@ AvmOptimizer.optimizeAVM = function(oplist) {
    var op_inlineswap = AvmOptimizer.inlineSWAP(oplist);
    var op_pattern1 = AvmOptimizer.detect_PUSH1_PACK_TOALTSTACK(oplist);
    var op_pattern2 = AvmOptimizer.detect_TOALTSTACK_DUPFROMALTSTACK(oplist);
+   var op_pattern3 = AvmOptimizer.detect_DUP_TOALT_FROM_ALT_DROP(oplist);
 
-   return nop_rem + op_dup + op_inlineswap + op_pattern1 + op_pattern2;
+   return nop_rem + op_dup + op_inlineswap + op_pattern1 + op_pattern2 + op_pattern3;
 }
 
 AvmOptimizer.getAVMFromList = function(oplist) {
