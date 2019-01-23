@@ -961,6 +961,36 @@ AvmOptimizer.detectDUPFROMALTSTACK = function(oplist)
    return count_change;
 } // detectDUPFROMALTSTACK
 
+// detect the pattern: 51 PUSH1, c1 PACK, 00 PUSH0, c3 PICKITEM
+AvmOptimizer.detect_51c100c3 = function(oplist)
+{
+   var count_change = 0;
+   var count_jmp_adjust = 0;
+   var i = 0;
+   while(i < oplist.length-3)
+   {
+      if((oplist[i].hexcode == "51") &&
+         (oplist[i+1].hexcode == "c1") &&
+         (oplist[i+2].hexcode == "00") &&
+         (oplist[i+3].hexcode == "c3"))
+      {
+         console.log("detect_51c100c3 at i="+i+" oplist="+oplist.length+"\n");
+         count_change++;
+
+         // Step 1: remove four operations at i
+         count_jmp_adjust += AvmOptimizer.removeOP(oplist, i); // automatically adjust jumps
+         count_jmp_adjust += AvmOptimizer.removeOP(oplist, i); // automatically adjust jumps
+         count_jmp_adjust += AvmOptimizer.removeOP(oplist, i); // automatically adjust jumps
+         count_jmp_adjust += AvmOptimizer.removeOP(oplist, i); // automatically adjust jumps
+      }
+      else // if NOP not found
+         i++;
+   }
+
+   console.log("detect_51c100c3: "+count_change+" Adjusted "+count_jmp_adjust+" jumps/calls.");
+   return count_change;
+} // detect pattern 51c100c3
+
 // detect the sequence: PUSH1 PACK TOALTSTACK
 AvmOptimizer.detect_PUSH1_PACK_TOALTSTACK = function(oplist)
 {
@@ -1153,8 +1183,9 @@ AvmOptimizer.optimizeAVM = function(oplist) {
    var op_pattern1 = AvmOptimizer.detect_PUSH1_PACK_TOALTSTACK(oplist);
    var op_pattern2 = AvmOptimizer.detect_TOALTSTACK_DUPFROMALTSTACK(oplist);
    var op_pattern3 = AvmOptimizer.detect_DUP_TOALT_FROM_ALT_DROP(oplist);
+   var op_pattern4 = AvmOptimizer.detect_51c100c3(oplist);
 
-   return nop_rem + op_dup + op_inlineswap + op_pattern1 + op_pattern2 + op_pattern3;
+   return nop_rem + op_dup + op_inlineswap + op_pattern1 + op_pattern2 + op_pattern3 + op_pattern4;
 }
 
 AvmOptimizer.getAVMFromList = function(oplist) {
